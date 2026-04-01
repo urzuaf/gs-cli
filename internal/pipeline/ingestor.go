@@ -2,7 +2,9 @@ package pipeline
 
 import (
 	"bufio"
+	"encoding/hex"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -16,18 +18,21 @@ import (
 )
 
 const MaxBatchSizeBytes = 16 * 1024 * 1024 // 16 MB
+const LoggerBatch = 100000
 
 type Ingestor struct {
-	db    *rocks.Store
-	meta  *metastore.MetaStore
-	cache *cache.NodeCache
+	db        *rocks.Store
+	meta      *metastore.MetaStore
+	cache     *cache.NodeCache
+	Verbosity int
 }
 
-func NewIngestor(db *rocks.Store, meta *metastore.MetaStore, cache *cache.NodeCache) *Ingestor {
+func NewIngestor(db *rocks.Store, meta *metastore.MetaStore, cache *cache.NodeCache, verbosity int) *Ingestor {
 	return &Ingestor{
-		db:    db,
-		meta:  meta,
-		cache: cache,
+		db:        db,
+		meta:      meta,
+		cache:     cache,
+		Verbosity: verbosity,
 	}
 }
 
@@ -48,6 +53,7 @@ func (ig *Ingestor) IngestNodes(filePath string) error {
 	defer batch.Destroy()
 
 	var currentBatchBytes int
+	var count int
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -57,6 +63,9 @@ func (ig *Ingestor) IngestNodes(filePath string) error {
 
 		if strings.HasPrefix(line, "@") {
 			currentHeader = parser.ParseHeader(line)
+			if ig.Verbosity >= 3 {
+				log.Printf("DEBUG: New header detected: %v\n", currentHeader)
+			}
 			continue
 		}
 
@@ -69,12 +78,25 @@ func (ig *Ingestor) IngestNodes(filePath string) error {
 			continue
 		}
 
+		if ig.Verbosity >= 1 {
+			count++
+			if count%LoggerBatch == 0 {
+				log.Printf("INFO: Ingested %d nodes...\n", count)
+			}
+		}
+
 		// save in cache
 		ig.cache.Put(rec.ID, rec.Label)
 
 		// serialize
 		nodeKey := storage.EncodeNodeKey(rec.ID)
 		nodeVal := storage.EncodeNodeValue(rec.Label, rec.Props)
+
+		if ig.Verbosity >= 3 {
+			log.Printf("DEBUG: Node record: ID=%s, Label=%s, Props=%v\n", rec.ID, rec.Label, rec.Props)
+			log.Printf("DEBUG: Binary Key:   %s\n", hex.EncodeToString(nodeKey))
+			log.Printf("DEBUG: Binary Value: %s\n", hex.EncodeToString(nodeVal))
+		}
 
 		// add batch to rocks
 		batch.PutCF(ig.db.CFNodes, nodeKey, nodeVal)
@@ -88,6 +110,9 @@ func (ig *Ingestor) IngestNodes(filePath string) error {
 			idxKey := storage.IdxKey("prop", k, storage.Norm(v), rec.ID)
 			batch.PutCF(ig.db.CFIndex, idxKey, []byte{})
 			currentBatchBytes += len(idxKey)
+			if ig.Verbosity >= 3 {
+				log.Printf("DEBUG:   Prop Index Key [%s=%s]: %s\n", k, v, hex.EncodeToString(idxKey))
+			}
 		}
 
 		// update metadata
@@ -134,6 +159,7 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 	defer batch.Destroy()
 
 	var currentBatchBytes int
+	var count int
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -143,6 +169,9 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 
 		if strings.HasPrefix(line, "@") {
 			currentHeader = parser.ParseHeader(line)
+			if ig.Verbosity >= 3 {
+				log.Printf("DEBUG: New header detected: %v\n", currentHeader)
+			}
 			continue
 		}
 
@@ -159,6 +188,14 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 			continue
 		}
 
+		// log progress (Level 1+)
+		if ig.Verbosity >= 1 {
+			count++
+			if count%LoggerBatch == 0 {
+				log.Printf("INFO: Ingested %d edges...\n", count)
+			}
+		}
+
 		// generate if no ID
 		edgeID := rec.ID
 		if edgeID == "" {
@@ -169,6 +206,12 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 		edgeKey := storage.EncodeEdgeKey(edgeID)
 		edgeVal := storage.EncodeEdgeValue(rec.Label, rec.Src, rec.Dst, rec.Props)
 
+		if ig.Verbosity >= 3 {
+			log.Printf("DEBUG: Edge record: ID=%s, Label=%s, Src=%s, Dst=%s, Props=%v\n", edgeID, rec.Label, rec.Src, rec.Dst, rec.Props)
+			log.Printf("DEBUG: Binary Key:   %s\n", hex.EncodeToString(edgeKey))
+			log.Printf("DEBUG: Binary Value: %s\n", hex.EncodeToString(edgeVal))
+		}
+
 		batch.PutCF(ig.db.CFEdges, edgeKey, edgeVal)
 		currentBatchBytes += len(edgeKey) + len(edgeVal)
 
@@ -176,6 +219,9 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 		idxLabelKey := storage.IdxKey("label", "edge", rec.Label, edgeID)
 		batch.PutCF(ig.db.CFIndex, idxLabelKey, edgeVal)
 		currentBatchBytes += len(idxLabelKey)
+		if ig.Verbosity >= 3 {
+			log.Printf("DEBUG:   Label Index Key: %s\n", hex.EncodeToString(idxLabelKey))
+		}
 
 		// src index
 		idxSrcKey := storage.IdxKey("edgesBySrc", rec.Src, edgeID)
@@ -195,6 +241,9 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 			idxKey := storage.IdxKey("propEdge", k, storage.Norm(v), edgeID)
 			batch.PutCF(ig.db.CFIndex, idxKey, []byte{})
 			currentBatchBytes += len(idxKey)
+			if ig.Verbosity >= 3 {
+				log.Printf("DEBUG:   Prop Index Key [%s=%s]: %s\n", k, v, hex.EncodeToString(idxKey))
+			}
 		}
 
 		// save metadata using cache

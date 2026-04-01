@@ -24,7 +24,7 @@ type Store struct {
 	RO *grocksdb.ReadOptions
 }
 
-func Open(dbPath string) (*Store, error) {
+func Open(dbPath string, readOnly bool) (*Store, error) {
 	bbto := grocksdb.NewDefaultBlockBasedTableOptions()
 	bbto.SetCacheIndexAndFilterBlocks(true) //
 
@@ -39,15 +39,23 @@ func Open(dbPath string) (*Store, error) {
 
 	// general options
 	dbOpts := grocksdb.NewDefaultOptions()
-	dbOpts.SetCreateIfMissing(true)               //
-	dbOpts.SetCreateIfMissingColumnFamilies(true) //
-	dbOpts.SetMaxBackgroundJobs(runtime.NumCPU()) //
+	dbOpts.SetCreateIfMissing(!readOnly)               //
+	dbOpts.SetCreateIfMissingColumnFamilies(!readOnly) //
+	dbOpts.SetMaxBackgroundJobs(runtime.NumCPU())      //
 
 	cfNames := []string{CFDefault, CFNodes, CFEdges, CFIndex}
 	cfOptions := []*grocksdb.Options{cfOpts, cfOpts, cfOpts, cfOpts}
 
-	// open the db
-	db, handles, err := grocksdb.OpenDbColumnFamilies(dbOpts, dbPath, cfNames, cfOptions)
+	var db *grocksdb.DB
+	var handles []*grocksdb.ColumnFamilyHandle
+	var err error
+
+	if readOnly {
+		db, handles, err = grocksdb.OpenDbForReadOnlyColumnFamilies(dbOpts, dbPath, cfNames, cfOptions, false)
+	} else {
+		db, handles, err = grocksdb.OpenDbColumnFamilies(dbOpts, dbPath, cfNames, cfOptions)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -66,6 +74,14 @@ func Open(dbPath string) (*Store, error) {
 		WO:      wo,
 		RO:      ro,
 	}, nil
+}
+
+// GetProperty returns a property from the DB or a specific CF
+func (s *Store) GetProperty(propName string, cf *grocksdb.ColumnFamilyHandle) string {
+	if cf != nil {
+		return s.DB.GetPropertyCF(propName, cf)
+	}
+	return s.DB.GetProperty(propName)
 }
 
 // safely release the memory

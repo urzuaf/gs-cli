@@ -141,3 +141,19 @@ func (m *MetaStore) Save(dbPath string) error {
 	metaFile := filepath.Join(dbPath, "metadata.json")
 	return os.WriteFile(metaFile, fileBytes, 0644)
 }
+
+// Load reads metadata from a file
+func Load(dbPath string) (*MetaData, error) {
+	metaFile := filepath.Join(dbPath, "metadata.json")
+	fileBytes, err := os.ReadFile(metaFile)
+	if err != nil {
+		return nil, err
+	}
+
+	var data MetaData
+	if err := json.Unmarshal(fileBytes, &data); err != nil {
+		return nil, err
+	}
+
+	return &data, nil
+}
