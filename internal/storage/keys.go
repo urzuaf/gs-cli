@@ -9,8 +9,7 @@ import (
 const SEP byte = 0
 
 func IdxKey(parts ...string) []byte {
-
-	totalSize := 3 + len(parts)
+	totalSize := len(parts) - 1 // SEPs
 	for _, s := range parts {
 		totalSize += len(s)
 	}
@@ -18,11 +17,11 @@ func IdxKey(parts ...string) []byte {
 	buffer := make([]byte, totalSize)
 	offset := 0
 
-	offset += copy(buffer[offset:], "idx")
-	for _, s := range parts {
-		buffer[offset] = SEP
-		offset++
-
+	for i, s := range parts {
+		if i > 0 {
+			buffer[offset] = SEP
+			offset++
+		}
 		offset += copy(buffer[offset:], s)
 	}
 

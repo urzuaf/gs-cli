@@ -107,8 +107,8 @@ func (ig *Ingestor) IngestNodes(filePath string) error {
 			if v == "" {
 				continue
 			}
-			idxKey := storage.IdxKey("prop", k, storage.Norm(v), rec.ID)
-			batch.PutCF(ig.db.CFIndex, idxKey, []byte{})
+			idxKey := storage.IdxKey(k, storage.Norm(v), rec.ID)
+			batch.PutCF(ig.db.CFIdxNodeProp, idxKey, []byte{})
 			currentBatchBytes += len(idxKey)
 			if ig.Verbosity >= 3 {
 				log.Printf("DEBUG:   Prop Index Key [%s=%s]: %s\n", k, v, hex.EncodeToString(idxKey))
@@ -215,31 +215,31 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 		batch.PutCF(ig.db.CFEdges, edgeKey, edgeVal)
 		currentBatchBytes += len(edgeKey) + len(edgeVal)
 
-		// covering index by label
-		idxLabelKey := storage.IdxKey("label", "edge", rec.Label, edgeID)
-		batch.PutCF(ig.db.CFIndex, idxLabelKey, edgeVal)
-		currentBatchBytes += len(idxLabelKey)
+		// 1. Label index (Covering Index)
+		idxLabelKey := storage.IdxKey(rec.Label, edgeID)
+		batch.PutCF(ig.db.CFIdxLabel, idxLabelKey, edgeVal)
+		currentBatchBytes += len(idxLabelKey) + len(edgeVal)
 		if ig.Verbosity >= 3 {
 			log.Printf("DEBUG:   Label Index Key: %s\n", hex.EncodeToString(idxLabelKey))
 		}
 
-		// src index
-		idxSrcKey := storage.IdxKey("edgesBySrc", rec.Src, edgeID)
-		batch.PutCF(ig.db.CFIndex, idxSrcKey, []byte{})
+		// 2. Src index
+		idxSrcKey := storage.IdxKey(rec.Src, edgeID)
+		batch.PutCF(ig.db.CFIdxEdgeSrc, idxSrcKey, []byte{})
 		currentBatchBytes += len(idxSrcKey)
 
-		// dst index
-		idxDstKey := storage.IdxKey("edgesByDst", rec.Dst, edgeID)
-		batch.PutCF(ig.db.CFIndex, idxDstKey, []byte{})
+		// 3. Dst index
+		idxDstKey := storage.IdxKey(rec.Dst, edgeID)
+		batch.PutCF(ig.db.CFIdxEdgeDst, idxDstKey, []byte{})
 		currentBatchBytes += len(idxDstKey)
 
-		// property index
+		// 4. Property index
 		for k, v := range rec.Props {
 			if v == "" {
 				continue
 			}
-			idxKey := storage.IdxKey("propEdge", k, storage.Norm(v), edgeID)
-			batch.PutCF(ig.db.CFIndex, idxKey, []byte{})
+			idxKey := storage.IdxKey(k, storage.Norm(v), edgeID)
+			batch.PutCF(ig.db.CFIdxEdgeProp, idxKey, []byte{})
 			currentBatchBytes += len(idxKey)
 			if ig.Verbosity >= 3 {
 				log.Printf("DEBUG:   Prop Index Key [%s=%s]: %s\n", k, v, hex.EncodeToString(idxKey))
