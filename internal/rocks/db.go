@@ -7,18 +7,26 @@ import (
 )
 
 const (
-	CFDefault = "default"
-	CFNodes   = "cf_nodes"
-	CFEdges   = "cf_edges"
-	CFIndex   = "cf_index"
+	CFDefault     = "default"
+	CFNodes       = "cf_nodes"
+	CFEdges       = "cf_edges"
+	CFIdxNodeProp = "cf_idx_node_prop"
+	CFIdxEdgeProp = "cf_idx_edge_prop"
+	CFIdxEdgeSrc  = "cf_idx_edge_src"
+	CFIdxEdgeDst  = "cf_idx_edge_dst"
+	CFIdxLabel    = "cf_idx_label"
 )
 
 type Store struct {
 	DB *grocksdb.DB
 
-	CFNodes *grocksdb.ColumnFamilyHandle
-	CFEdges *grocksdb.ColumnFamilyHandle
-	CFIndex *grocksdb.ColumnFamilyHandle
+	CFNodes       *grocksdb.ColumnFamilyHandle
+	CFEdges       *grocksdb.ColumnFamilyHandle
+	CFIdxNodeProp *grocksdb.ColumnFamilyHandle
+	CFIdxEdgeProp *grocksdb.ColumnFamilyHandle
+	CFIdxEdgeSrc  *grocksdb.ColumnFamilyHandle
+	CFIdxEdgeDst  *grocksdb.ColumnFamilyHandle
+	CFIdxLabel    *grocksdb.ColumnFamilyHandle
 
 	WO *grocksdb.WriteOptions
 	RO *grocksdb.ReadOptions
@@ -43,8 +51,11 @@ func Open(dbPath string, readOnly bool) (*Store, error) {
 	dbOpts.SetCreateIfMissingColumnFamilies(!readOnly) //
 	dbOpts.SetMaxBackgroundJobs(runtime.NumCPU())      //
 
-	cfNames := []string{CFDefault, CFNodes, CFEdges, CFIndex}
-	cfOptions := []*grocksdb.Options{cfOpts, cfOpts, cfOpts, cfOpts}
+	cfNames := []string{CFDefault, CFNodes, CFEdges, CFIdxNodeProp, CFIdxEdgeProp, CFIdxEdgeSrc, CFIdxEdgeDst, CFIdxLabel}
+	cfOptions := make([]*grocksdb.Options, len(cfNames))
+	for i := range cfOptions {
+		cfOptions[i] = cfOpts
+	}
 
 	var db *grocksdb.DB
 	var handles []*grocksdb.ColumnFamilyHandle
@@ -67,12 +78,16 @@ func Open(dbPath string, readOnly bool) (*Store, error) {
 	ro := grocksdb.NewDefaultReadOptions()
 
 	return &Store{
-		DB:      db,
-		CFNodes: handles[1],
-		CFEdges: handles[2],
-		CFIndex: handles[3],
-		WO:      wo,
-		RO:      ro,
+		DB:            db,
+		CFNodes:       handles[1],
+		CFEdges:       handles[2],
+		CFIdxNodeProp: handles[3],
+		CFIdxEdgeProp: handles[4],
+		CFIdxEdgeSrc:  handles[5],
+		CFIdxEdgeDst:  handles[6],
+		CFIdxLabel:    handles[7],
+		WO:            wo,
+		RO:            ro,
 	}, nil
 }
 
@@ -98,8 +113,20 @@ func (s *Store) Close() {
 	if s.CFEdges != nil {
 		s.CFEdges.Destroy()
 	}
-	if s.CFIndex != nil {
-		s.CFIndex.Destroy()
+	if s.CFIdxNodeProp != nil {
+		s.CFIdxNodeProp.Destroy()
+	}
+	if s.CFIdxEdgeProp != nil {
+		s.CFIdxEdgeProp.Destroy()
+	}
+	if s.CFIdxEdgeSrc != nil {
+		s.CFIdxEdgeSrc.Destroy()
+	}
+	if s.CFIdxEdgeDst != nil {
+		s.CFIdxEdgeDst.Destroy()
+	}
+	if s.CFIdxLabel != nil {
+		s.CFIdxLabel.Destroy()
 	}
 	if s.DB != nil {
 		s.DB.Close()
