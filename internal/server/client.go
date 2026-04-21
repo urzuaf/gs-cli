@@ -14,8 +14,11 @@ type PathReturnContent struct {
 }
 
 type QueryMetadata struct {
-	Time       string `json:"time"`
-	TotalPaths int    `json:"totalPaths"`
+	Time           string `json:"time"`
+	TotalPaths     int    `json:"totalPaths"`
+	StorageTime    string `json:"storageTime"`
+	ConversionTime string `json:"conversionTime"`
+	ProcessingTime string `json:"processingTime"`
 }
 
 type RequestReturnContent struct {
