@@ -8,6 +8,7 @@ import (
 	"gs-cli/internal/rocks"
 	"gs-cli/internal/server"
 	"gs-cli/internal/session"
+	"gs-cli/internal/validator"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -79,6 +80,8 @@ func (e *Executor) handleMetaCommand(in string) {
 		fmt.Printf("Active database set to: %s\n", e.State.ActiveDB)
 	case "\\i":
 		e.ingest(parts[1:])
+	case "\\validate":
+		e.validate(parts[1:])
 	case "\\create":
 		if len(parts) < 2 {
 			fmt.Println("Usage: \\create <dbname>")
@@ -165,6 +168,29 @@ func (e *Executor) listDBs() {
 	}
 }
 
+func (e *Executor) validate(args []string) {
+	var nodesPath, edgesPath string
+	for i := 0; i < len(args); i++ {
+		if args[i] == "-n" && i+1 < len(args) {
+			nodesPath = args[i+1]
+			i++
+		} else if args[i] == "-e" && i+1 < len(args) {
+			edgesPath = args[i+1]
+			i++
+		}
+	}
+
+	if nodesPath == "" || edgesPath == "" {
+		fmt.Println("Usage: \\validate -n <nodes.pgdf> -e <edges.pgdf>")
+		return
+	}
+
+	v := validator.NewPGDFValidator()
+	if err := v.Validate(nodesPath, edgesPath); err != nil {
+		fmt.Printf("Validation error: %v\n", err)
+	}
+}
+
 func (e *Executor) ingest(args []string) {
 	if e.State.CurrentMode != session.ModeLocal {
 		fmt.Println("Error: Ingestion is only available in LOCAL mode.")
@@ -188,6 +214,14 @@ func (e *Executor) ingest(args []string) {
 
 	if nodesPath == "" || edgesPath == "" {
 		fmt.Println("Error: Both -n <nodes.pgdf> and -e <edges.pgdf> are required for ingestion.")
+		return
+	}
+
+	// Phase 0: Validation
+	fmt.Println("Phase 0: Validating PGDF files...")
+	v := validator.NewPGDFValidator()
+	if err := v.Validate(nodesPath, edgesPath); err != nil {
+		fmt.Printf("Aborting ingestion due to validation errors: %v\n", err)
 		return
 	}
 
@@ -258,7 +292,12 @@ func (e *Executor) runQuery(query string) {
 		return
 	}
 
-	fmt.Printf("Summary: [Time: %s] [Total Paths: %d]\n", result.Metadata.Time, result.Metadata.TotalPaths)
+	fmt.Printf("Summary: [Total Time: %ss] [Storage: %ss] [Conversion: %ss] [Processing: %ss] [Paths: %d]\n",
+		result.Metadata.Time,
+		result.Metadata.StorageTime,
+		result.Metadata.ConversionTime,
+		result.Metadata.ProcessingTime,
+		result.Metadata.TotalPaths)
 
 	if e.State.ShowResults {
 		for i, path := range result.Data {
