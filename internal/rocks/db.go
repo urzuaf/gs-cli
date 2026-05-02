@@ -17,6 +17,28 @@ const (
 	CFIdxLabel    = "cf_idx_label"
 )
 
+type IDListMergeOperator struct{}
+
+func (m *IDListMergeOperator) FullMerge(key, existingValue []byte, operands [][]byte) ([]byte, bool) {
+	result := make([]byte, len(existingValue))
+	copy(result, existingValue)
+	for _, op := range operands {
+		result = append(result, op...)
+	}
+	return result, true
+}
+
+func (m *IDListMergeOperator) PartialMerge(key, leftOperand, rightOperand []byte) ([]byte, bool) {
+	result := make([]byte, len(leftOperand)+len(rightOperand))
+	copy(result, leftOperand)
+	copy(result[len(leftOperand):], rightOperand)
+	return result, true
+}
+
+func (m *IDListMergeOperator) Name() string {
+	return "IDListMergeOperator"
+}
+
 type Store struct {
 	DB *grocksdb.DB
 
@@ -53,8 +75,25 @@ func Open(dbPath string, readOnly bool) (*Store, error) {
 
 	cfNames := []string{CFDefault, CFNodes, CFEdges, CFIdxNodeProp, CFIdxEdgeProp, CFIdxEdgeSrc, CFIdxEdgeDst, CFIdxLabel}
 	cfOptions := make([]*grocksdb.Options, len(cfNames))
+
+	// Create common options
 	for i := range cfOptions {
 		cfOptions[i] = cfOpts
+	}
+
+	// Assign MergeOperator to specific Index CFs
+	mergeOp := &IDListMergeOperator{}
+	idxWithMerge := []int{3, 4, 5, 6} // CFIdxNodeProp, CFIdxEdgeProp, CFIdxEdgeSrc, CFIdxEdgeDst
+	for _, idx := range idxWithMerge {
+		opts := grocksdb.NewDefaultOptions()
+		opts.SetBlockBasedTableFactory(bbto)
+		opts.SetCompression(grocksdb.LZ4Compression)
+		opts.SetBottommostCompression(grocksdb.LZ4Compression)
+		opts.SetWriteBufferSize(128 * 1024 * 1024)
+		opts.SetMaxWriteBufferNumber(4)
+		opts.SetMinWriteBufferNumberToMerge(2)
+		opts.SetMergeOperator(mergeOp)
+		cfOptions[idx] = opts
 	}
 
 	var db *grocksdb.DB

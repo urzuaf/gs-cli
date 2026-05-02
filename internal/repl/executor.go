@@ -80,6 +80,18 @@ func (e *Executor) handleMetaCommand(in string) {
 		fmt.Printf("Active database set to: %s\n", e.State.ActiveDB)
 	case "\\i":
 		e.ingest(parts[1:])
+	case "\\ingest-unrolled":
+		e.ingestBench(parts[1:], pipeline.StrategyUnrolled)
+	case "\\ingest-rolled-naive":
+		e.ingestBench(parts[1:], pipeline.StrategyRolledNaive)
+	case "\\ingest-rolled-merge":
+		e.ingestBench(parts[1:], pipeline.StrategyRolledMerge)
+	case "\\get-unrolled":
+		e.queryBench(parts[1:], pipeline.StrategyUnrolled)
+	case "\\get-rolled-naive":
+		e.queryBench(parts[1:], pipeline.StrategyRolledNaive)
+	case "\\get-rolled-merge":
+		e.queryBench(parts[1:], pipeline.StrategyRolledMerge)
 	case "\\validate":
 		e.validate(parts[1:])
 	case "\\create":
@@ -292,9 +304,13 @@ func (e *Executor) runQuery(query string) {
 		return
 	}
 
-	fmt.Printf("Summary: [Total Time: %ss] [Storage: %ss] [Conversion: %ss] [Processing: %ss] [Paths: %d]\n",
+	fmt.Printf("Summary: [Total: %s] [Storage: %s (Fetch: %s, Decode: %s, Entry: %s, Calls: %d)] [Conversion: %s] [Processing: %s] [Paths: %d]\n",
 		result.Metadata.Time,
 		result.Metadata.StorageTime,
+		result.Metadata.StorageFetchTime,
+		result.Metadata.StorageDecodeTime,
+		result.Metadata.StorageEntryTime,
+		result.Metadata.StorageCallCount,
 		result.Metadata.ConversionTime,
 		result.Metadata.ProcessingTime,
 		result.Metadata.TotalPaths)
@@ -338,6 +354,96 @@ func (e *Executor) describe() {
 		fmt.Println("Describe remote not fully implemented yet.")
 	} else {
 		fmt.Println("Select a database first.")
+	}
+}
+
+func (e *Executor) ingestBench(args []string, strategy pipeline.IndexStrategy) {
+	if e.State.CurrentMode != session.ModeLocal {
+		fmt.Println("Error: Ingestion is only available in LOCAL mode.")
+		return
+	}
+	if e.State.ActiveDB == "" {
+		fmt.Println("Error: No active database selected. Use \\c <dbname>")
+		return
+	}
+
+	var nodesPath, edgesPath string
+	for i := 0; i < len(args); i++ {
+		if args[i] == "-n" && i+1 < len(args) {
+			nodesPath = args[i+1]
+			i++
+		} else if args[i] == "-e" && i+1 < len(args) {
+			edgesPath = args[i+1]
+			i++
+		}
+	}
+
+	if nodesPath == "" && edgesPath == "" {
+		fmt.Println("Usage: \\ingest-[unrolled|rolled-naive|rolled-merge] [-n <nodes.pgdf>] [-e <edges.pgdf>]")
+		return
+	}
+
+	dbPath := filepath.Join(e.State.LocalRoot, e.State.ActiveDB)
+	
+	dbStore, err := rocks.Open(dbPath, false)
+	if err != nil {
+		fmt.Printf("Error opening DB: %v\n", err)
+		return
+	}
+	defer dbStore.Close()
+
+	meta := metastore.NewMetaStore()
+	nodeCache := cache.NewNodeCache()
+	defer nodeCache.Clear()
+
+	benchIngestor := pipeline.NewBenchIngestor(dbStore, meta, nodeCache, dbPath)
+	
+	if err := benchIngestor.Ingest(nodesPath, edgesPath, strategy); err != nil {
+		fmt.Printf("Benchmark Ingestion error: %v\n", err)
+		return
+	}
+}
+
+func (e *Executor) queryBench(args []string, strategy pipeline.IndexStrategy) {
+	if e.State.CurrentMode != session.ModeLocal || e.State.ActiveDB == "" {
+		fmt.Println("Error: Query benchmark only available for active LOCAL database.")
+		return
+	}
+
+	var prop, val, src string
+	for i := 0; i < len(args); i++ {
+		if args[i] == "-p" && i+1 < len(args) {
+			prop = args[i+1]
+			i++
+		} else if args[i] == "-v" && i+1 < len(args) {
+			val = args[i+1]
+			i++
+		} else if args[i] == "-src" && i+1 < len(args) {
+			src = args[i+1]
+			i++
+		}
+	}
+
+	dbPath := filepath.Join(e.State.LocalRoot, e.State.ActiveDB)
+	dbStore, err := rocks.Open(dbPath, true)
+	if err != nil {
+		fmt.Printf("Error opening DB: %v\n", err)
+		return
+	}
+	defer dbStore.Close()
+
+	bench := pipeline.NewBenchIngestor(dbStore, nil, nil, dbPath)
+
+	if src != "" {
+		if err := bench.QueryEdgesBySrc(src, strategy); err != nil {
+			fmt.Printf("Query error: %v\n", err)
+		}
+	} else if prop != "" && val != "" {
+		if err := bench.QueryNodes(prop, val, strategy); err != nil {
+			fmt.Printf("Query error: %v\n", err)
+		}
+	} else {
+		fmt.Println("Usage: \\get-[strategy] -p <prop> -v <val>   OR   \\get-[strategy] -src <nodeID>")
 	}
 }
 

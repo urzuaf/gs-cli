@@ -14,11 +14,15 @@ type PathReturnContent struct {
 }
 
 type QueryMetadata struct {
-	Time           string `json:"time"`
-	TotalPaths     int    `json:"totalPaths"`
-	StorageTime    string `json:"storageTime"`
-	ConversionTime string `json:"conversionTime"`
-	ProcessingTime string `json:"processingTime"`
+	Time              string `json:"time"`
+	TotalPaths        int    `json:"totalPaths"`
+	StorageTime       string `json:"storageTime"`
+	StorageFetchTime  string `json:"storageFetchTime"`
+	StorageDecodeTime string `json:"storageDecodeTime"`
+	StorageEntryTime  string `json:"storageEntryTime"`
+	StorageCallCount  int64  `json:"storageCallCount"`
+	ConversionTime    string `json:"conversionTime"`
+	ProcessingTime    string `json:"processingTime"`
 }
 
 type RequestReturnContent struct {
