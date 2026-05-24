@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -40,13 +41,17 @@ func NewClient(port int) *Client {
 	return &Client{
 		BaseURL: fmt.Sprintf("http://localhost:%d", port),
 		HTTPClient: &http.Client{
-			Timeout: 300 * time.Second,
+			Timeout: 120 * time.Second,
 		},
 	}
 }
 
 func (c *Client) CheckStatus() (bool, error) {
-	resp, err := c.HTTPClient.Get(c.BaseURL + "/api/v1/healthcheck")
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	req, _ := http.NewRequestWithContext(ctx, "GET", c.BaseURL+"/api/v1/healthcheck", nil)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return false, err
 	}
@@ -102,7 +107,7 @@ func (c *Client) UseDatabase(dbName string) (string, error) {
 	return result.Message, nil
 }
 
-func (c *Client) Query(dbName, query string) (*RequestReturnContent, error) {
+func (c *Client) Query(dbName, query string, dryRun bool) (*RequestReturnContent, error) {
 	if ok, err := c.CheckStatus(); !ok || err != nil {
 		return nil, fmt.Errorf("server is not reachable")
 	}
@@ -115,6 +120,9 @@ func (c *Client) Query(dbName, query string) (*RequestReturnContent, error) {
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("PathDB-Graph-DB", dbName)
+	if dryRun {
+		req.Header.Set("PathDB-Dry-Run", "true")
+	}
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {

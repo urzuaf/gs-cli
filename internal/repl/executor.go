@@ -110,10 +110,15 @@ func (e *Executor) handleMetaCommand(in string) {
 		fmt.Printf("Display of detailed query results is now: %s\n", status)
 	case "\\benchmark":
 		if len(parts) < 2 {
-			fmt.Println("Usage: \\benchmark <filepath>")
+			fmt.Println("Usage: \\benchmark <filepath> [--fast]")
 			return
 		}
-		e.runBenchmark(parts[1])
+		fast := false
+		filePath := parts[1]
+		if len(parts) > 2 && (parts[2] == "--fast" || parts[2] == "-fast") {
+			fast = true
+		}
+		e.runBenchmark(filePath, fast)
 	default:
 		fmt.Printf("Unknown meta-command: %s. Use \\q to exit.\n", cmd)
 	}
@@ -302,7 +307,7 @@ func (e *Executor) dropDB(name string) {
 
 func (e *Executor) runQuery(query string) {
 	fmt.Printf("Executing query on remote DB '%s'...\n", e.State.ActiveDB)
-	result, err := e.State.Client.Query(e.State.ActiveDB, query)
+	result, err := e.State.Client.Query(e.State.ActiveDB, query, false)
 	if err != nil {
 		fmt.Printf("Query error: %v\n", err)
 		return
@@ -323,7 +328,7 @@ func (e *Executor) runQuery(query string) {
 	}
 }
 
-func (e *Executor) runBenchmark(filepath string) {
+func (e *Executor) runBenchmark(filepath string, fast bool) {
 	if e.State.CurrentMode != session.ModeRemote {
 		fmt.Println("Error: Benchmark must be run in remote mode.")
 		return
@@ -354,59 +359,76 @@ func (e *Executor) runBenchmark(filepath string) {
 		return
 	}
 
-	baseName := filepath[strings.LastIndex(filepath, "/")+1:]
-	if i := strings.LastIndex(baseName, "."); i > 0 {
-		baseName = baseName[:i]
+	var rawFile, finalFile *os.File
+	if !fast {
+		baseName := filepath[strings.LastIndex(filepath, "/")+1:]
+		if i := strings.LastIndex(baseName, "."); i > 0 {
+			baseName = baseName[:i]
+		}
+
+		rawFile, err = os.Create(fmt.Sprintf("raw_results_%s.txt", baseName))
+		if err != nil {
+			fmt.Printf("Error creating raw results file: %v\n", err)
+			return
+		}
+		defer rawFile.Close()
+
+		finalFile, err = os.Create(fmt.Sprintf("final_results_%s.txt", baseName))
+		if err != nil {
+			fmt.Printf("Error creating final results file: %v\n", err)
+			return
+		}
+		defer finalFile.Close()
+
+		rawFile.WriteString(fmt.Sprintf("Benchmark on DB: %s\n", e.State.ActiveDB))
+		rawFile.WriteString("--------------------------------------------------\n")
+		finalFile.WriteString(fmt.Sprintf("Benchmark Averages on DB: %s\n", e.State.ActiveDB))
+		finalFile.WriteString("--------------------------------------------------\n")
 	}
 
-	rawFile, err := os.Create(fmt.Sprintf("raw_results_%s.txt", baseName))
-	if err != nil {
-		fmt.Printf("Error creating raw results file: %v\n", err)
-		return
+	numRuns := 5
+	if fast {
+		numRuns = 1
+		fmt.Printf("Starting FAST benchmark (1 run per query) for %d queries...\n", len(queries))
+	} else {
+		fmt.Printf("Starting benchmark (5 runs per query) for %d queries...\n", len(queries))
 	}
-	defer rawFile.Close()
-
-	finalFile, err := os.Create(fmt.Sprintf("final_results_%s.txt", baseName))
-	if err != nil {
-		fmt.Printf("Error creating final results file: %v\n", err)
-		return
-	}
-	defer finalFile.Close()
-
-	rawFile.WriteString(fmt.Sprintf("Benchmark on DB: %s\n", e.State.ActiveDB))
-	rawFile.WriteString("--------------------------------------------------\n")
-	finalFile.WriteString(fmt.Sprintf("Benchmark Averages on DB: %s\n", e.State.ActiveDB))
-	finalFile.WriteString("--------------------------------------------------\n")
-
-	fmt.Printf("Starting benchmark for %d queries...\n", len(queries))
 
 	for i, query := range queries {
 		fmt.Printf("Running Query %d/%d: %s\n", i+1, len(queries), query)
-		rawFile.WriteString(fmt.Sprintf("\nQuery %d: %s\n", i+1, query))
-		
+		if !fast {
+			rawFile.WriteString(fmt.Sprintf("\nQuery %d: %s\n", i+1, query))
+		}
+
 		var times []float64
 		var peakRAMs []float64
 		var pathCounts []int
 		var errors []string
 
-		for run := 1; run <= 5; run++ {
-			fmt.Printf("  Run %d... ", run)
-			result, err := e.State.Client.Query(e.State.ActiveDB, query)
-			
+		for run := 1; run <= numRuns; run++ {
+			if !fast {
+				fmt.Printf("  Run %d... ", run)
+			}
+			// In benchmark, we use dryRun = true to measure pure engine performance
+			result, err := e.State.Client.Query(e.State.ActiveDB, query, true)
+
 			if err != nil {
 				errMsg := fmt.Sprintf("Error: %v", err)
 				fmt.Println(errMsg)
-				rawFile.WriteString(fmt.Sprintf("  Run %d: %s\n", run, errMsg))
+				if !fast {
+					rawFile.WriteString(fmt.Sprintf("  Run %d: %s\n", run, errMsg))
+				}
 				errors = append(errors, errMsg)
 
 				if strings.Contains(errMsg, "timed out") {
-					fmt.Println("  Skipping remaining runs for this query due to timeout.")
+					if !fast {
+						fmt.Println("  Skipping remaining runs for this query due to timeout.")
+					}
 					break
 				}
-				
+
 				if strings.Contains(errMsg, "server is not reachable") || strings.Contains(errMsg, "connection refused") || strings.Contains(errMsg, "EOF") {
 					fmt.Println("  CRITICAL ERROR: Server seems to have crashed. Skipping remaining runs for this query.")
-					// Wait a few seconds to let the user restart the server if they are testing manually
 					time.Sleep(2 * time.Second)
 					break
 				}
@@ -420,7 +442,7 @@ func (e *Executor) runBenchmark(filepath string) {
 				fmt.Println("failed to parse time")
 				continue
 			}
-			
+
 			// Parse Peak RAM
 			ramStr := strings.TrimSuffix(result.Metadata.PeakMemory, " MB")
 			ramStr = strings.ReplaceAll(ramStr, ",", ".")
@@ -434,43 +456,54 @@ func (e *Executor) runBenchmark(filepath string) {
 			peakRAMs = append(peakRAMs, ram)
 			pathCounts = append(pathCounts, result.Metadata.TotalPaths)
 
-			fmt.Printf("OK (%.3fs)\n", t)
-			rawFile.WriteString(fmt.Sprintf("  Run %d: [Time: %.3fs] [Peak RAM: %.2f MB] [Paths: %d]\n", run, t, ram, result.Metadata.TotalPaths))
+			if fast {
+				fmt.Printf("  Summary: [Time: %.3fs] [Peak RAM: %.2f MB] [Paths: %d]\n", t, ram, result.Metadata.TotalPaths)
+			} else {
+				fmt.Printf("OK (%.3fs)\n", t)
+				rawFile.WriteString(fmt.Sprintf("  Run %d: [Time: %.3fs] [Peak RAM: %.2f MB] [Paths: %d]\n", run, t, ram, result.Metadata.TotalPaths))
+			}
 		}
 
-		if len(errors) == 5 || (len(errors) > 0 && len(times) == 0) {
-			finalFile.WriteString(fmt.Sprintf("Q%d: FAILED (%s)\n", i+1, errors[0]))
-			continue
-		}
-
-		if len(times) >= 3 {
-			// Sort to drop highest and lowest
-			sort.Float64s(times)
-			sort.Float64s(peakRAMs)
-			
-			// Drop 1 highest, 1 lowest
-			validTimes := times[1 : len(times)-1]
-			validRams := peakRAMs[1 : len(peakRAMs)-1]
-
-			var sumTime, sumRam float64
-			for _, v := range validTimes { sumTime += v }
-			for _, v := range validRams { sumRam += v }
-			
-			avgTime := sumTime / float64(len(validTimes))
-			avgRam := sumRam / float64(len(validRams))
-			
-			// Take the path count from the first successful run
-			paths := 0
-			if len(pathCounts) > 0 {
-				paths = pathCounts[0]
+		if !fast {
+			if len(errors) == numRuns || (len(errors) > 0 && len(times) == 0) {
+				finalFile.WriteString(fmt.Sprintf("Q%d: FAILED (%s)\n", i+1, errors[0]))
+				continue
 			}
 
-			finalFile.WriteString(fmt.Sprintf("Q%d: [Avg Time: %.3fs] [Avg Peak RAM: %.2f MB] [Paths: %d]\n", i+1, avgTime, avgRam, paths))
-		} else {
-			finalFile.WriteString(fmt.Sprintf("Q%d: INCOMPLETE (Not enough successful runs to average)\n", i+1))
+			if len(times) >= 3 {
+				sort.Float64s(times)
+				sort.Float64s(peakRAMs)
+
+				validTimes := times[1 : len(times)-1]
+				validRams := peakRAMs[1 : len(peakRAMs)-1]
+
+				var sumTime, sumRam float64
+				for _, v := range validTimes {
+					sumTime += v
+				}
+				for _, v := range validRams {
+					sumRam += v
+				}
+
+				avgTime := sumTime / float64(len(validTimes))
+				avgRam := sumRam / float64(len(validRams))
+
+				paths := 0
+				if len(pathCounts) > 0 {
+					paths = pathCounts[0]
+				}
+
+				finalFile.WriteString(fmt.Sprintf("Q%d: [Avg Time: %.3fs] [Avg Peak RAM: %.2f MB] [Paths: %d]\n", i+1, avgTime, avgRam, paths))
+			} else {
+				finalFile.WriteString(fmt.Sprintf("Q%d: INCOMPLETE (Not enough successful runs to average)\n", i+1))
+			}
 		}
 	}
-	fmt.Println("Benchmark complete. Results saved.")
+	if fast {
+		fmt.Println("Fast Benchmark complete.")
+	} else {
+		fmt.Println("Benchmark complete. Results saved.")
+	}
 }
 
 func (e *Executor) showStats() {
