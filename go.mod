@@ -4,6 +4,7 @@ go 1.25.7
 
 require (
 	github.com/c-bata/go-prompt v0.2.6
+	github.com/google/uuid v1.6.0
 	github.com/linxGnu/grocksdb v1.10.7
 )
 

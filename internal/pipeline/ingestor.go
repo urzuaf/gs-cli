@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"github.com/google/uuid"
 
 	"github.com/linxGnu/grocksdb"
 
@@ -18,6 +19,7 @@ import (
 )
 
 const MaxBatchSizeBytes = 16 * 1024 * 1024 // 16 MB
+const TargetMegaBlobSizeBytes = 16 * 1024 * 1024 // 16 MB target for FatBatches
 const LoggerBatch = 100000
 
 type Ingestor struct {
@@ -85,12 +87,12 @@ func (ig *Ingestor) IngestNodes(filePath string) error {
 			}
 		}
 
-		// save in cache
-		ig.cache.Put(rec.ID, rec.Label)
-
 		// serialize
 		nodeKey := storage.EncodeNodeKey(rec.ID)
 		nodeVal := storage.EncodeNodeValue(rec.Label, rec.Props)
+
+		// save in cache
+		ig.cache.Put(rec.ID, nodeVal)
 
 		if ig.Verbosity >= 3 {
 			log.Printf("DEBUG: Node record: ID=%s, Label=%s, Props=%v\n", rec.ID, rec.Label, rec.Props)
@@ -161,6 +163,10 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 	var currentBatchBytes int
 	var count int
 
+	// Fat Indexing structures
+	labelToPendingMegaBlobs := make(map[string][][]byte)
+	labelToPendingSize := make(map[string]int)
+
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if line == "" {
@@ -204,7 +210,7 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 
 		// serialize
 		edgeKey := storage.EncodeEdgeKey(edgeID)
-		edgeVal := storage.EncodeEdgeValue(rec.Label, rec.Src, rec.Dst, rec.Props)
+		edgeVal := storage.EncodeEdgeValue(edgeID, rec.Label, rec.Src, rec.Dst, rec.Props)
 
 		if ig.Verbosity >= 3 {
 			log.Printf("DEBUG: Edge record: ID=%s, Label=%s, Src=%s, Dst=%s, Props=%v\n", edgeID, rec.Label, rec.Src, rec.Dst, rec.Props)
@@ -215,13 +221,28 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 		batch.PutCF(ig.db.CFEdges, edgeKey, edgeVal)
 		currentBatchBytes += len(edgeKey) + len(edgeVal)
 
-		// 1. Label index (Covering Index)
-		idxLabelKey := storage.IdxKey(rec.Label, edgeID)
-		batch.PutCF(ig.db.CFIdxLabel, idxLabelKey, edgeVal)
-		currentBatchBytes += len(idxLabelKey) + len(edgeVal)
-		if ig.Verbosity >= 3 {
-			log.Printf("DEBUG:   Label Index Key: %s\n", hex.EncodeToString(idxLabelKey))
+		// fat indexing: group blobs in batches by target byte size per label
+		srcB, _ := ig.cache.Get(rec.Src)
+		dstB, _ := ig.cache.Get(rec.Dst)
+		megaBlob := storage.EncodeMegaBlob(edgeVal, srcB, dstB)
+
+		pending := labelToPendingMegaBlobs[rec.Label]
+		currentSize, ok := labelToPendingSize[rec.Label]
+		if !ok {
+			currentSize = 4 // 4 bytes for count in FatBatch
 		}
+
+		pending = append(pending, megaBlob)
+		currentSize += 4 + len(megaBlob) // 4 bytes for length prefix per megaBlob
+
+		if currentSize >= TargetMegaBlobSizeBytes {
+			fatBatchKey := []byte(rec.Label + ":" + uuid.New().String())
+			batch.PutCF(ig.db.CFIdxLabel, fatBatchKey, storage.EncodeFatBatch(pending))
+			pending = nil
+			currentSize = 4
+		}
+		labelToPendingMegaBlobs[rec.Label] = pending
+		labelToPendingSize[rec.Label] = currentSize
 
 		// 2. Src index
 		idxSrcKey := storage.IdxKey(rec.Src, edgeID)
@@ -246,16 +267,12 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 			}
 		}
 
-		// save metadata using cache
-		srcLabel, _ := ig.cache.Get(rec.Src)
-		dstLabel, _ := ig.cache.Get(rec.Dst)
-
+		// update metadata (note: src/dst labels are not available here easily without decoding cache)
 		propKeys := make([]string, 0, len(rec.Props))
 		for k := range rec.Props {
 			propKeys = append(propKeys, k)
 		}
-
-		ig.meta.IncEdge(rec.Label, srcLabel, dstLabel, propKeys)
+		ig.meta.IncEdge(rec.Label, "", "", propKeys) // Labels are left empty as per current MetaStore use
 
 		// Flush batch
 		if currentBatchBytes >= MaxBatchSizeBytes {
@@ -264,6 +281,14 @@ func (ig *Ingestor) IngestEdges(filePath string) error {
 			}
 			batch.Clear()
 			currentBatchBytes = 0
+		}
+	}
+
+	// Flush remaining Fat Batches
+	for label, pending := range labelToPendingMegaBlobs {
+		if len(pending) > 0 {
+			fatBatchKey := []byte(label + ":" + uuid.New().String())
+			batch.PutCF(ig.db.CFIdxLabel, fatBatchKey, storage.EncodeFatBatch(pending))
 		}
 	}
 

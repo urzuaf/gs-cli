@@ -1,6 +1,7 @@
 package repl
 
 import (
+	"bufio"
 	"fmt"
 	"gs-cli/internal/cache"
 	"gs-cli/internal/metastore"
@@ -11,8 +12,10 @@ import (
 	"gs-cli/internal/validator"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Executor struct {
@@ -105,6 +108,12 @@ func (e *Executor) handleMetaCommand(in string) {
 			status = "ON"
 		}
 		fmt.Printf("Display of detailed query results is now: %s\n", status)
+	case "\\benchmark":
+		if len(parts) < 2 {
+			fmt.Println("Usage: \\benchmark <filepath>")
+			return
+		}
+		e.runBenchmark(parts[1])
 	default:
 		fmt.Printf("Unknown meta-command: %s. Use \\q to exit.\n", cmd)
 	}
@@ -202,6 +211,7 @@ func (e *Executor) ingest(args []string) {
 	}
 
 	var nodesPath, edgesPath string
+	skipValidation := false
 	for i := 0; i < len(args); i++ {
 		if args[i] == "-n" && i+1 < len(args) {
 			nodesPath = args[i+1]
@@ -209,6 +219,8 @@ func (e *Executor) ingest(args []string) {
 		} else if args[i] == "-e" && i+1 < len(args) {
 			edgesPath = args[i+1]
 			i++
+		} else if args[i] == "-yolo" || args[i] == "--yolo" {
+			skipValidation = true
 		}
 	}
 
@@ -218,11 +230,15 @@ func (e *Executor) ingest(args []string) {
 	}
 
 	// Phase 0: Validation
-	fmt.Println("Phase 0: Validating PGDF files...")
-	v := validator.NewPGDFValidator()
-	if err := v.Validate(nodesPath, edgesPath); err != nil {
-		fmt.Printf("Aborting ingestion due to validation errors: %v\n", err)
-		return
+	if !skipValidation {
+		fmt.Println("Phase 0: Validating PGDF files...")
+		v := validator.NewPGDFValidator()
+		if err := v.Validate(nodesPath, edgesPath); err != nil {
+			fmt.Printf("Aborting ingestion due to validation errors: %v\n", err)
+			return
+		}
+	} else {
+		fmt.Println("Phase 0: Skipping validation (YOLO mode activated)...")
 	}
 
 	dbPath := filepath.Join(e.State.LocalRoot, e.State.ActiveDB)
@@ -292,11 +308,10 @@ func (e *Executor) runQuery(query string) {
 		return
 	}
 
-	fmt.Printf("Summary: [Total Time: %ss] [Storage: %ss] [Conversion: %ss] [Processing: %ss] [Paths: %d]\n",
+	fmt.Printf("Summary: [Total: %ss] [Peak RAM: %s] [Max RAM: %s] [Paths: %d]\n",
 		result.Metadata.Time,
-		result.Metadata.StorageTime,
-		result.Metadata.ConversionTime,
-		result.Metadata.ProcessingTime,
+		result.Metadata.PeakMemory,
+		result.Metadata.MaxMemory,
 		result.Metadata.TotalPaths)
 
 	if e.State.ShowResults {
@@ -306,6 +321,156 @@ func (e *Executor) runQuery(query string) {
 	} else {
 		fmt.Println("Use \\results to toggle detailed path output.")
 	}
+}
+
+func (e *Executor) runBenchmark(filepath string) {
+	if e.State.CurrentMode != session.ModeRemote {
+		fmt.Println("Error: Benchmark must be run in remote mode.")
+		return
+	}
+	if e.State.ActiveDB == "" {
+		fmt.Println("Error: No active database selected.")
+		return
+	}
+
+	file, err := os.Open(filepath)
+	if err != nil {
+		fmt.Printf("Error opening file: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	var queries []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line != "" && !strings.HasPrefix(line, "--") {
+			queries = append(queries, line)
+		}
+	}
+
+	if len(queries) == 0 {
+		fmt.Println("No queries found in file.")
+		return
+	}
+
+	baseName := filepath[strings.LastIndex(filepath, "/")+1:]
+	if i := strings.LastIndex(baseName, "."); i > 0 {
+		baseName = baseName[:i]
+	}
+
+	rawFile, err := os.Create(fmt.Sprintf("raw_results_%s.txt", baseName))
+	if err != nil {
+		fmt.Printf("Error creating raw results file: %v\n", err)
+		return
+	}
+	defer rawFile.Close()
+
+	finalFile, err := os.Create(fmt.Sprintf("final_results_%s.txt", baseName))
+	if err != nil {
+		fmt.Printf("Error creating final results file: %v\n", err)
+		return
+	}
+	defer finalFile.Close()
+
+	rawFile.WriteString(fmt.Sprintf("Benchmark on DB: %s\n", e.State.ActiveDB))
+	rawFile.WriteString("--------------------------------------------------\n")
+	finalFile.WriteString(fmt.Sprintf("Benchmark Averages on DB: %s\n", e.State.ActiveDB))
+	finalFile.WriteString("--------------------------------------------------\n")
+
+	fmt.Printf("Starting benchmark for %d queries...\n", len(queries))
+
+	for i, query := range queries {
+		fmt.Printf("Running Query %d/%d: %s\n", i+1, len(queries), query)
+		rawFile.WriteString(fmt.Sprintf("\nQuery %d: %s\n", i+1, query))
+		
+		var times []float64
+		var peakRAMs []float64
+		var pathCounts []int
+		var errors []string
+
+		for run := 1; run <= 5; run++ {
+			fmt.Printf("  Run %d... ", run)
+			result, err := e.State.Client.Query(e.State.ActiveDB, query)
+			
+			if err != nil {
+				errMsg := fmt.Sprintf("Error: %v", err)
+				fmt.Println(errMsg)
+				rawFile.WriteString(fmt.Sprintf("  Run %d: %s\n", run, errMsg))
+				errors = append(errors, errMsg)
+
+				if strings.Contains(errMsg, "timed out") {
+					fmt.Println("  Skipping remaining runs for this query due to timeout.")
+					break
+				}
+				
+				if strings.Contains(errMsg, "server is not reachable") || strings.Contains(errMsg, "connection refused") || strings.Contains(errMsg, "EOF") {
+					fmt.Println("  CRITICAL ERROR: Server seems to have crashed. Skipping remaining runs for this query.")
+					// Wait a few seconds to let the user restart the server if they are testing manually
+					time.Sleep(2 * time.Second)
+					break
+				}
+				continue
+			}
+
+			// Parse time (handle both comma and dot)
+			tStr := strings.ReplaceAll(result.Metadata.Time, ",", ".")
+			t, err := strconv.ParseFloat(tStr, 64)
+			if err != nil {
+				fmt.Println("failed to parse time")
+				continue
+			}
+			
+			// Parse Peak RAM
+			ramStr := strings.TrimSuffix(result.Metadata.PeakMemory, " MB")
+			ramStr = strings.ReplaceAll(ramStr, ",", ".")
+			ram, err := strconv.ParseFloat(ramStr, 64)
+			if err != nil {
+				fmt.Println("failed to parse ram")
+				continue
+			}
+
+			times = append(times, t)
+			peakRAMs = append(peakRAMs, ram)
+			pathCounts = append(pathCounts, result.Metadata.TotalPaths)
+
+			fmt.Printf("OK (%.3fs)\n", t)
+			rawFile.WriteString(fmt.Sprintf("  Run %d: [Time: %.3fs] [Peak RAM: %.2f MB] [Paths: %d]\n", run, t, ram, result.Metadata.TotalPaths))
+		}
+
+		if len(errors) == 5 || (len(errors) > 0 && len(times) == 0) {
+			finalFile.WriteString(fmt.Sprintf("Q%d: FAILED (%s)\n", i+1, errors[0]))
+			continue
+		}
+
+		if len(times) >= 3 {
+			// Sort to drop highest and lowest
+			sort.Float64s(times)
+			sort.Float64s(peakRAMs)
+			
+			// Drop 1 highest, 1 lowest
+			validTimes := times[1 : len(times)-1]
+			validRams := peakRAMs[1 : len(peakRAMs)-1]
+
+			var sumTime, sumRam float64
+			for _, v := range validTimes { sumTime += v }
+			for _, v := range validRams { sumRam += v }
+			
+			avgTime := sumTime / float64(len(validTimes))
+			avgRam := sumRam / float64(len(validRams))
+			
+			// Take the path count from the first successful run
+			paths := 0
+			if len(pathCounts) > 0 {
+				paths = pathCounts[0]
+			}
+
+			finalFile.WriteString(fmt.Sprintf("Q%d: [Avg Time: %.3fs] [Avg Peak RAM: %.2f MB] [Paths: %d]\n", i+1, avgTime, avgRam, paths))
+		} else {
+			finalFile.WriteString(fmt.Sprintf("Q%d: INCOMPLETE (Not enough successful runs to average)\n", i+1))
+		}
+	}
+	fmt.Println("Benchmark complete. Results saved.")
 }
 
 func (e *Executor) showStats() {
