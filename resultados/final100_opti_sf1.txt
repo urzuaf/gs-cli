@@ -1,0 +1,52 @@
+Benchmark Averages on DB: sf1
+--------------------------------------------------
+Q1: [Avg Time: 0.113s] [Avg Peak RAM: 5926.71 MB] [Paths: 100]
+Q2: [Avg Time: 0.161s] [Avg Peak RAM: 5964.56 MB] [Paths: 100]
+Q3: [Avg Time: 0.040s] [Avg Peak RAM: 5840.76 MB] [Paths: 100]
+Q4: [Avg Time: 0.055s] [Avg Peak RAM: 5860.99 MB] [Paths: 100]
+Q5: [Avg Time: 0.004s] [Avg Peak RAM: 5813.11 MB] [Paths: 100]
+Q6: [Avg Time: 4.747s] [Avg Peak RAM: 6117.30 MB] [Paths: 44]
+Q7: [Avg Time: 0.002s] [Avg Peak RAM: 5813.31 MB] [Paths: 100]
+Q8: [Avg Time: 0.002s] [Avg Peak RAM: 5813.33 MB] [Paths: 100]
+Q9: [Avg Time: 0.002s] [Avg Peak RAM: 5813.42 MB] [Paths: 100]
+Q10: [Avg Time: 0.002s] [Avg Peak RAM: 5813.50 MB] [Paths: 100]
+Q11: [Avg Time: 0.152s] [Avg Peak RAM: 5929.54 MB] [Paths: 100]
+Q12: FAILED (Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.)
+Q13: FAILED (Error: The query exceeded the memory limit.)
+Q14: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q15: FAILED (Error: The query exceeded the memory limit.)
+Q16: FAILED (Error: The query exceeded the memory limit.)
+Q17: FAILED (Error: The query exceeded the memory limit.)
+Q18: FAILED (Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.)
+Q19: FAILED (Error: The query exceeded the memory limit.)
+Q20: FAILED (Error: server is not reachable)
+Q21: FAILED (Error: server is not reachable)
+Q22: FAILED (Error: server is not reachable)
+Q23: FAILED (Error: server is not reachable)
+Q24: FAILED (Error: server is not reachable)
+Q25: FAILED (Error: server is not reachable)
+Q26: FAILED (Error: server is not reachable)
+Q27: FAILED (Error: server is not reachable)
+Q28: FAILED (Error: server is not reachable)
+Q29: FAILED (Error: server is not reachable)
+Q30: FAILED (Error: server is not reachable)
+Q31: FAILED (Error: server is not reachable)
+Q32: FAILED (Error: server is not reachable)
+Q33: FAILED (Error: server is not reachable)
+Q34: FAILED (Error: server is not reachable)
+Q35: FAILED (Error: server is not reachable)
+Q36: FAILED (Error: server is not reachable)
+Q37: FAILED (Error: server is not reachable)
+Q38: FAILED (Error: server is not reachable)
+Q39: FAILED (Error: server is not reachable)
+Q40: FAILED (Error: server is not reachable)
+Q41: FAILED (Error: server is not reachable)
+Q42: FAILED (Error: server is not reachable)
+Q43: FAILED (Error: server is not reachable)
+Q44: FAILED (Error: server is not reachable)
+Q45: FAILED (Error: server is not reachable)
+Q46: FAILED (Error: server is not reachable)
+Q47: FAILED (Error: server is not reachable)
+Q48: FAILED (Error: server is not reachable)
+Q49: FAILED (Error: server is not reachable)
+Q50: FAILED (Error: server is not reachable)

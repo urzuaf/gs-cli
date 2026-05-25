@@ -1,0 +1,52 @@
+Benchmark Averages on DB: sf3
+--------------------------------------------------
+Q1: [Avg Time: 0.143s] [Avg Peak RAM: 127.87 MB] [Paths: 100]
+Q2: [Avg Time: 1.212s] [Avg Peak RAM: 555.79 MB] [Paths: 100]
+Q3: [Avg Time: 0.252s] [Avg Peak RAM: 222.73 MB] [Paths: 100]
+Q4: [Avg Time: 0.161s] [Avg Peak RAM: 186.98 MB] [Paths: 100]
+Q5: [Avg Time: 0.137s] [Avg Peak RAM: 152.49 MB] [Paths: 100]
+Q6: FAILED (Error: Query execution timed out after 60 seconds.)
+Q7: [Avg Time: 0.443s] [Avg Peak RAM: 248.37 MB] [Paths: 100]
+Q8: [Avg Time: 0.253s] [Avg Peak RAM: 221.34 MB] [Paths: 100]
+Q9: [Avg Time: 0.215s] [Avg Peak RAM: 212.37 MB] [Paths: 100]
+Q10: [Avg Time: 0.264s] [Avg Peak RAM: 205.68 MB] [Paths: 100]
+Q11: [Avg Time: 3.553s] [Avg Peak RAM: 2228.92 MB] [Paths: 100]
+Q12: [Avg Time: 74.863s] [Avg Peak RAM: 8709.53 MB] [Paths: 100]
+Q13: FAILED (Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.)
+Q14: [Avg Time: 110.228s] [Avg Peak RAM: 6481.84 MB] [Paths: 100]
+Q15: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q16: FAILED (Error: server is not reachable)
+Q17: FAILED (Error: The query exceeded the memory limit.)
+Q18: INCOMPLETE (Not enough successful runs to average)
+Q19: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q20: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q21: FAILED (Error: The query exceeded the memory limit.)
+Q22: FAILED (Error: server is not reachable)
+Q23: FAILED (Error: server is not reachable)
+Q24: [Avg Time: 11.749s] [Avg Peak RAM: 6034.95 MB] [Paths: 100]
+Q25: [Avg Time: 2.102s] [Avg Peak RAM: 5340.46 MB] [Paths: 100]
+Q26: [Avg Time: 2.309s] [Avg Peak RAM: 5791.01 MB] [Paths: 100]
+Q27: [Avg Time: 2.056s] [Avg Peak RAM: 5811.91 MB] [Paths: 100]
+Q28: [Avg Time: 2.000s] [Avg Peak RAM: 5819.41 MB] [Paths: 100]
+Q29: [Avg Time: 2.035s] [Avg Peak RAM: 5946.59 MB] [Paths: 100]
+Q30: [Avg Time: 3.554s] [Avg Peak RAM: 6029.39 MB] [Paths: 100]
+Q31: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q32: FAILED (Error: server is not reachable)
+Q33: FAILED (Error: server is not reachable)
+Q34: FAILED (Error: server is not reachable)
+Q35: FAILED (Error: server is not reachable)
+Q36: FAILED (Error: server is not reachable)
+Q37: FAILED (Error: server is not reachable)
+Q38: FAILED (Error: server is not reachable)
+Q39: FAILED (Error: server is not reachable)
+Q40: [Avg Time: 1.492s] [Avg Peak RAM: 3655.29 MB] [Paths: 100]
+Q41: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q42: FAILED (Error: server is not reachable)
+Q43: FAILED (Error: server is not reachable)
+Q44: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q45: FAILED (Error: server is not reachable)
+Q46: FAILED (Error: server is not reachable)
+Q47: FAILED (Error: server is not reachable)
+Q48: FAILED (Error: server is not reachable)
+Q49: FAILED (Error: server is not reachable)
+Q50: FAILED (Error: server is not reachable)

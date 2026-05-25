@@ -1,0 +1,52 @@
+Benchmark Averages on DB: sf1
+--------------------------------------------------
+Q1: [Avg Time: 1.325s] [Avg Peak RAM: 541.48 MB] [Paths: 518]
+Q2: [Avg Time: 14.604s] [Avg Peak RAM: 4805.53 MB] [Paths: 3889]
+Q3: INCOMPLETE (Not enough successful runs to average)
+Q4: [Avg Time: 32.858s] [Avg Peak RAM: 5179.65 MB] [Paths: 1903]
+Q5: FAILED (Error: Query execution timed out after 60 seconds.)
+Q6: [Avg Time: 32.834s] [Avg Peak RAM: 5079.27 MB] [Paths: 44]
+Q7: FAILED (Error: Query execution timed out after 60 seconds.)
+Q8: FAILED (Error: Query execution timed out after 60 seconds.)
+Q9: [Avg Time: 32.040s] [Avg Peak RAM: 4016.84 MB] [Paths: 3019396]
+Q10: FAILED (Error: Query execution timed out after 60 seconds.)
+Q11: [Avg Time: 3.802s] [Avg Peak RAM: 1733.42 MB] [Paths: 167461]
+Q12: [Avg Time: 46.986s] [Avg Peak RAM: 6410.44 MB] [Paths: 80856]
+Q13: FAILED (Error: Query execution timed out after 60 seconds.)
+Q14: [Avg Time: 84.055s] [Avg Peak RAM: 5745.77 MB] [Paths: 129867]
+Q15: [Avg Time: 42.271s] [Avg Peak RAM: 4713.05 MB] [Paths: 7127]
+Q16: INCOMPLETE (Not enough successful runs to average)
+Q17: FAILED (Error: Query execution timed out after 60 seconds.)
+Q18: [Avg Time: 6.145s] [Avg Peak RAM: 5113.37 MB] [Paths: 116487]
+Q19: INCOMPLETE (Not enough successful runs to average)
+Q20: [Avg Time: 9.342s] [Avg Peak RAM: 4241.88 MB] [Paths: 164321]
+Q21: INCOMPLETE (Not enough successful runs to average)
+Q22: [Avg Time: 0.360s] [Avg Peak RAM: 466.06 MB] [Paths: 15348]
+Q23: FAILED (Error: Query execution timed out after 60 seconds.)
+Q24: FAILED (Error: Query execution timed out after 60 seconds.)
+Q25: FAILED (Error: Query execution timed out after 60 seconds.)
+Q26: FAILED (Error: Query execution timed out after 60 seconds.)
+Q27: FAILED (Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.)
+Q28: FAILED (Error: Query execution timed out after 60 seconds.)
+Q29: FAILED (Error: Query execution timed out after 60 seconds.)
+Q30: FAILED (Error: Query execution timed out after 60 seconds.)
+Q31: [Avg Time: 7.395s] [Avg Peak RAM: 2155.05 MB] [Paths: 340475]
+Q32: [Avg Time: 41.886s] [Avg Peak RAM: 6993.33 MB] [Paths: 2096463]
+Q33: [Avg Time: 43.786s] [Avg Peak RAM: 5407.49 MB] [Paths: 1870268]
+Q34: [Avg Time: 38.715s] [Avg Peak RAM: 4248.96 MB] [Paths: 3337827]
+Q35: FAILED (Error: Query execution timed out after 60 seconds.)
+Q36: FAILED (Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.)
+Q37: [Avg Time: 70.012s] [Avg Peak RAM: 6632.67 MB] [Paths: 2909768]
+Q38: FAILED (Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.)
+Q39: [Avg Time: 0.201s] [Avg Peak RAM: 367.08 MB] [Paths: 8309]
+Q40: [Avg Time: 0.375s] [Avg Peak RAM: 461.31 MB] [Paths: 22044]
+Q41: [Avg Time: 73.409s] [Avg Peak RAM: 7364.38 MB] [Paths: 4041954]
+Q42: [Avg Time: 0.454s] [Avg Peak RAM: 514.80 MB] [Paths: 381]
+Q43: [Avg Time: 50.376s] [Avg Peak RAM: 5699.21 MB] [Paths: 1831211]
+Q44: FAILED (Error: Query execution timed out after 60 seconds.)
+Q45: [Avg Time: 89.995s] [Avg Peak RAM: 6524.22 MB] [Paths: 3082782]
+Q46: FAILED (Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.)
+Q47: FAILED (Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers))
+Q48: [Avg Time: 42.087s] [Avg Peak RAM: 4752.42 MB] [Paths: 848463]
+Q49: [Avg Time: 24.607s] [Avg Peak RAM: 7387.61 MB] [Paths: 8836]
+Q50: [Avg Time: 64.208s] [Avg Peak RAM: 7207.94 MB] [Paths: 2997352]

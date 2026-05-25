@@ -1,0 +1,289 @@
+Benchmark on DB: sf1
+--------------------------------------------------
+
+Query 1: match p =  (x)-[Knows]->(y) WHERE x.firstName = "Juan" return p;
+  Run 1: [Time: 2.708s] [Peak RAM: 461.97 MB] [Paths: 518]
+  Run 2: [Time: 1.328s] [Peak RAM: 540.20 MB] [Paths: 518]
+  Run 3: [Time: 1.286s] [Peak RAM: 541.22 MB] [Paths: 518]
+  Run 4: [Time: 1.237s] [Peak RAM: 543.03 MB] [Paths: 518]
+  Run 5: [Time: 1.360s] [Peak RAM: 718.52 MB] [Paths: 518]
+
+Query 2: match p =  (x)-[Likes]->(y) WHERE x.firstName = "Maria" return p;
+  Run 1: [Time: 18.399s] [Peak RAM: 2270.02 MB] [Paths: 3889]
+  Run 2: [Time: 15.245s] [Peak RAM: 3724.11 MB] [Paths: 3889]
+  Run 3: [Time: 15.301s] [Peak RAM: 5331.96 MB] [Paths: 3889]
+  Run 4: [Time: 12.431s] [Peak RAM: 5360.52 MB] [Paths: 3889]
+  Run 5: [Time: 13.265s] [Peak RAM: 5360.57 MB] [Paths: 3889]
+
+Query 3: match p =  (x)-[HasCreator]->(y) WHERE y.firstName = "Jose" return p;
+  Run 1: [Time: 35.291s] [Peak RAM: 6654.60 MB] [Paths: 27375]
+  Run 2: [Time: 21.556s] [Peak RAM: 4933.10 MB] [Paths: 27375]
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 4: match p =  (x)-[Knows?]->(y) WHERE x.firstName = "Chen" return p;
+  Run 1: [Time: 43.587s] [Peak RAM: 7890.26 MB] [Paths: 1903]
+  Run 2: [Time: 28.817s] [Peak RAM: 3874.81 MB] [Paths: 1903]
+  Run 3: [Time: 32.296s] [Peak RAM: 5177.25 MB] [Paths: 1903]
+  Run 4: [Time: 32.965s] [Peak RAM: 5137.99 MB] [Paths: 1903]
+  Run 5: [Time: 33.314s] [Peak RAM: 5223.72 MB] [Paths: 1903]
+
+Query 5: match p =  (x)-[Likes?]->(y) WHERE x.browserUsed = "Firefox"  return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 6: match p =  (x)-[StudyAt?]->(y) WHERE x.firstName = "Ahmed"  return p;
+  Run 1: [Time: 38.739s] [Peak RAM: 5368.47 MB] [Paths: 44]
+  Run 2: [Time: 35.836s] [Peak RAM: 4409.28 MB] [Paths: 44]
+  Run 3: [Time: 32.089s] [Peak RAM: 4953.63 MB] [Paths: 44]
+  Run 4: [Time: 30.578s] [Peak RAM: 5148.38 MB] [Paths: 44]
+  Run 5: [Time: 29.541s] [Peak RAM: 5135.81 MB] [Paths: 44]
+
+Query 7: match p =  (x)-[IsLocatedIn]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 8: match p =  (x)-[HasTag]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 9: match p =  (x)-[WorkAt?]->(y) return p;
+  Run 1: [Time: 38.175s] [Peak RAM: 5287.56 MB] [Paths: 3019396]
+  Run 2: [Time: 33.854s] [Peak RAM: 3436.58 MB] [Paths: 3019396]
+  Run 3: [Time: 27.450s] [Peak RAM: 3439.41 MB] [Paths: 3019396]
+  Run 4: [Time: 34.815s] [Peak RAM: 4266.87 MB] [Paths: 3019396]
+  Run 5: [Time: 26.187s] [Peak RAM: 4344.25 MB] [Paths: 3019396]
+
+Query 10: match p =  (x)-[HasMember?]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 11: match p =  (x)-[Knows.Knows]->(y) return p;
+  Run 1: [Time: 12.828s] [Peak RAM: 4418.97 MB] [Paths: 167461]
+  Run 2: [Time: 3.771s] [Peak RAM: 1628.30 MB] [Paths: 167461]
+  Run 3: [Time: 3.697s] [Peak RAM: 1700.22 MB] [Paths: 167461]
+  Run 4: [Time: 3.750s] [Peak RAM: 1683.12 MB] [Paths: 167461]
+  Run 5: [Time: 3.884s] [Peak RAM: 1816.92 MB] [Paths: 167461]
+
+Query 12: match p =  (x)-[Likes.HasCreator]->(y) WHERE x.browserUsed = "Firefox" return p;
+  Run 1: [Time: 57.371s] [Peak RAM: 5104.26 MB] [Paths: 80856]
+  Run 2: [Time: 40.307s] [Peak RAM: 6034.89 MB] [Paths: 80856]
+  Run 3: [Time: 46.765s] [Peak RAM: 6785.99 MB] [Paths: 80856]
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: [Time: 47.208s] [Peak RAM: 9026.83 MB] [Paths: 80856]
+
+Query 13: match p =  (x)-[ReplyOf.HasCreator]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 14: match p =  (x)-[Knows.Likes.HasCreator]->(y) return p;
+  Run 1: [Time: 87.171s] [Peak RAM: 5699.84 MB] [Paths: 129867]
+  Run 2: [Time: 74.191s] [Peak RAM: 5938.58 MB] [Paths: 129867]
+  Run 3: [Time: 85.010s] [Peak RAM: 5116.67 MB] [Paths: 129867]
+  Run 4: [Time: 88.386s] [Peak RAM: 6266.18 MB] [Paths: 129867]
+  Run 5: [Time: 79.984s] [Peak RAM: 5598.89 MB] [Paths: 129867]
+
+Query 15: match p =  (x)-[HasMember.Knows.StudyAt]->(y) return p;
+  Run 1: [Time: 49.412s] [Peak RAM: 6166.30 MB] [Paths: 7127]
+  Run 2: [Time: 42.890s] [Peak RAM: 4702.65 MB] [Paths: 7127]
+  Run 3: [Time: 41.817s] [Peak RAM: 4895.71 MB] [Paths: 7127]
+  Run 4: [Time: 40.978s] [Peak RAM: 4366.99 MB] [Paths: 7127]
+  Run 5: [Time: 42.105s] [Peak RAM: 4540.80 MB] [Paths: 7127]
+
+Query 16: match p =  (x)-[ReplyOf.ReplyOf.HasCreator]->(y) return p;
+  Run 1: [Time: 89.747s] [Peak RAM: 5938.29 MB] [Paths: 264288]
+  Run 2: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 17: match p =  (x)-[HasMember.Knows.Likes]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 18: match p =  (x)-[Knows.Knows.Knows]->(y) WHERE x.firstName = "David" return p;
+  Run 1: [Time: 7.643s] [Peak RAM: 4277.73 MB] [Paths: 116487]
+  Run 2: [Time: 6.507s] [Peak RAM: 4721.49 MB] [Paths: 116487]
+  Run 3: [Time: 6.166s] [Peak RAM: 5019.92 MB] [Paths: 116487]
+  Run 4: [Time: 5.762s] [Peak RAM: 5610.70 MB] [Paths: 116487]
+  Run 5: [Time: 5.508s] [Peak RAM: 5598.71 MB] [Paths: 116487]
+
+Query 19: match p =  (x)-[ReplyOf.ReplyOf.ReplyOf.HasCreator]->(y) return p;
+  Run 1: [Time: 115.193s] [Peak RAM: 9423.62 MB] [Paths: 104423]
+  Run 2: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 20: match p =  (x)-[Knows.Knows.Knows.Knows]->(y) return p;
+  Run 1: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 2: [Time: 10.800s] [Peak RAM: 4103.53 MB] [Paths: 164321]
+  Run 3: [Time: 8.712s] [Peak RAM: 4161.68 MB] [Paths: 164321]
+  Run 4: [Time: 9.681s] [Peak RAM: 4322.07 MB] [Paths: 164321]
+  Run 5: [Time: 9.003s] [Peak RAM: 4330.32 MB] [Paths: 164321]
+
+Query 21: match p =  (x)-[Knows|Likes]->(y) return p;
+  Run 1: [Time: 43.220s] [Peak RAM: 4172.39 MB] [Paths: 2043282]
+  Run 2: [Time: 29.143s] [Peak RAM: 4125.10 MB] [Paths: 2043282]
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 22: match p =  (x)-[StudyAt|WorkAt]->(y) WHERE x.gender = "female" return p;
+  Run 1: [Time: 6.057s] [Peak RAM: 2330.96 MB] [Paths: 15348]
+  Run 2: [Time: 0.370s] [Peak RAM: 464.32 MB] [Paths: 15348]
+  Run 3: [Time: 0.334s] [Peak RAM: 463.19 MB] [Paths: 15348]
+  Run 4: [Time: 0.356s] [Peak RAM: 466.95 MB] [Paths: 15348]
+  Run 5: [Time: 0.354s] [Peak RAM: 466.91 MB] [Paths: 15348]
+
+Query 23: match p =  (x)-[HasCreator|HasMember]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 24: match p =  (x)-[Knows|Likes|ReplyOf]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 25: match p =  (x)-[StudyAt|WorkAt|IsLocatedIn]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 26: match p =  (x)-[HasTag|HasType|HasInterest]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 27: match p =  (x)-[HasCreator|HasMember|Knows]->(y) return p;
+  Run 1: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 2: Error: Query execution timed out after 60 seconds.
+
+Query 28: match p =  (x)-[Knows|Likes|ReplyOf|HasCreator]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 29: match p =  (x)-[StudyAt|WorkAt|HasInterest|HasTag]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 30: match p =  (x)-[IsLocatedIn|HasType|HasMember|Knows]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 31: match p =  (x)-[Knows+]->(y) return p;
+  Run 1: [Time: 17.140s] [Peak RAM: 5718.94 MB] [Paths: 340475]
+  Run 2: [Time: 5.178s] [Peak RAM: 2160.18 MB] [Paths: 340475]
+  Run 3: [Time: 5.465s] [Peak RAM: 2194.08 MB] [Paths: 340475]
+  Run 4: [Time: 7.935s] [Peak RAM: 2110.90 MB] [Paths: 340475]
+  Run 5: [Time: 8.785s] [Peak RAM: 1811.80 MB] [Paths: 340475]
+
+Query 32: match p =  (x)-[ReplyOf+]->(y) return p;
+  Run 1: [Time: 75.031s] [Peak RAM: 5780.44 MB] [Paths: 2096463]
+  Run 2: [Time: 45.162s] [Peak RAM: 6388.31 MB] [Paths: 2096463]
+  Run 3: [Time: 39.451s] [Peak RAM: 7120.56 MB] [Paths: 2096463]
+  Run 4: [Time: 41.046s] [Peak RAM: 7471.11 MB] [Paths: 2096463]
+  Run 5: [Time: 37.313s] [Peak RAM: 8188.46 MB] [Paths: 2096463]
+
+Query 33: match p =  (x)-[Likes+]->(y) return p;
+  Run 1: [Time: 53.883s] [Peak RAM: 6511.33 MB] [Paths: 1870268]
+  Run 2: [Time: 33.323s] [Peak RAM: 4801.75 MB] [Paths: 1870268]
+  Run 3: [Time: 45.987s] [Peak RAM: 5327.31 MB] [Paths: 1870268]
+  Run 4: [Time: 38.218s] [Peak RAM: 5482.64 MB] [Paths: 1870268]
+  Run 5: [Time: 47.154s] [Peak RAM: 5412.51 MB] [Paths: 1870268]
+
+Query 34: match p =  (x)-[Knows*]->(y) return p;
+  Run 1: [Time: 47.096s] [Peak RAM: 4918.37 MB] [Paths: 3337827]
+  Run 2: [Time: 33.697s] [Peak RAM: 3929.90 MB] [Paths: 3337827]
+  Run 3: [Time: 37.301s] [Peak RAM: 5319.43 MB] [Paths: 3337827]
+  Run 4: [Time: 39.538s] [Peak RAM: 3898.60 MB] [Paths: 3337827]
+  Run 5: [Time: 39.305s] [Peak RAM: 3508.34 MB] [Paths: 3337827]
+
+Query 35: match p =  (x)-[ReplyOf*]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 36: match p =  (x)-[IsLocatedIn+]->(y) return p;
+  Run 1: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 2: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 37: match p =  (x)-[HasMember+]->(y) return p;
+  Run 1: [Time: 76.058s] [Peak RAM: 6632.67 MB] [Paths: 2909768]
+  Run 2: [Time: 70.012s] [Peak RAM: 7105.10 MB] [Paths: 2909768]
+  Run 3: [Time: 67.922s] [Peak RAM: 6436.47 MB] [Paths: 2909768]
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 38: match p =  (x)-[HasCreator+]->(y) return p;
+  Run 1: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 2: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 39: match p =  (x)-[StudyAt+]->(y) return p;
+  Run 1: [Time: 9.562s] [Peak RAM: 4157.68 MB] [Paths: 8309]
+  Run 2: [Time: 0.188s] [Peak RAM: 366.31 MB] [Paths: 8309]
+  Run 3: [Time: 0.193s] [Peak RAM: 365.56 MB] [Paths: 8309]
+  Run 4: [Time: 0.164s] [Peak RAM: 369.38 MB] [Paths: 8309]
+  Run 5: [Time: 0.222s] [Peak RAM: 365.35 MB] [Paths: 8309]
+
+Query 40: match p =  (x)-[WorkAt+]->(y) return p;
+  Run 1: [Time: 0.737s] [Peak RAM: 537.36 MB] [Paths: 22044]
+  Run 2: [Time: 0.412s] [Peak RAM: 461.26 MB] [Paths: 22044]
+  Run 3: [Time: 0.341s] [Peak RAM: 457.38 MB] [Paths: 22044]
+  Run 4: [Time: 0.371s] [Peak RAM: 461.28 MB] [Paths: 22044]
+  Run 5: [Time: 0.327s] [Peak RAM: 461.40 MB] [Paths: 22044]
+
+Query 41: match p =  (x)-[(Likes|Knows)+]->(y) return p;
+  Run 1: [Time: 75.566s] [Peak RAM: 7680.61 MB] [Paths: 4041954]
+  Run 2: [Time: 67.573s] [Peak RAM: 6841.08 MB] [Paths: 4041954]
+  Run 3: [Time: 67.561s] [Peak RAM: 7571.46 MB] [Paths: 4041954]
+  Run 4: [Time: 84.070s] [Peak RAM: 7965.98 MB] [Paths: 4041954]
+  Run 5: [Time: 77.087s] [Peak RAM: 5988.96 MB] [Paths: 4041954]
+
+Query 42: match p =  (x)-[(StudyAt|WorkAt)+]->(y) WHERE x.firstName = "Carlos" return p;
+  Run 1: [Time: 5.218s] [Peak RAM: 2349.23 MB] [Paths: 381]
+  Run 2: [Time: 0.450s] [Peak RAM: 517.09 MB] [Paths: 381]
+  Run 3: [Time: 0.469s] [Peak RAM: 514.06 MB] [Paths: 381]
+  Run 4: [Time: 0.429s] [Peak RAM: 513.26 MB] [Paths: 381]
+  Run 5: [Time: 0.443s] [Peak RAM: 513.14 MB] [Paths: 381]
+
+Query 43: match p =  (x)-[Knows.Likes+]->(y) return p;
+  Run 1: [Time: 72.942s] [Peak RAM: 5734.95 MB] [Paths: 1831211]
+  Run 2: [Time: 49.703s] [Peak RAM: 5121.19 MB] [Paths: 1831211]
+  Run 3: [Time: 51.115s] [Peak RAM: 5225.98 MB] [Paths: 1831211]
+  Run 4: [Time: 50.311s] [Peak RAM: 6136.71 MB] [Paths: 1831211]
+  Run 5: [Time: 43.098s] [Peak RAM: 6144.95 MB] [Paths: 1831211]
+
+Query 44: match p =  (x)-[ReplyOf+.HasCreator]->(y) return p;
+  Run 1: Error: Query execution timed out after 60 seconds.
+
+Query 45: match p =  (x)-[HasMember.Knows?]->(y) return p;
+  Run 1: [Time: 114.990s] [Peak RAM: 8034.65 MB] [Paths: 3082782]
+  Run 2: [Time: 78.218s] [Peak RAM: 6307.94 MB] [Paths: 3082782]
+  Run 3: [Time: 83.638s] [Peak RAM: 6857.61 MB] [Paths: 3082782]
+  Run 4: [Time: 99.668s] [Peak RAM: 6407.10 MB] [Paths: 3082782]
+  Run 5: [Time: 86.678s] [Peak RAM: 6209.60 MB] [Paths: 3082782]
+
+Query 46: match p =  (x)-[(Likes.HasCreator)+]->(y) return p;
+  Run 1: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 2: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 47: match p =  (x)-[(ReplyOf|HasTag)*]->(y) return p;
+  Run 1: Error: Post "http://localhost:8080/api/v1/query/execute": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+  Run 2: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 3: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 4: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+  Run 5: Error: Execution error: Soft OOM Guard. Aborting to prevent server crash.
+
+Query 48: match p =  (x)-[(Knows|StudyAt)?]->(y) WHERE x.browserUsed = "Chrome" return p;
+  Run 1: [Time: 57.084s] [Peak RAM: 4654.25 MB] [Paths: 848463]
+  Run 2: [Time: 34.507s] [Peak RAM: 4196.32 MB] [Paths: 848463]
+  Run 3: [Time: 47.886s] [Peak RAM: 5475.48 MB] [Paths: 848463]
+  Run 4: [Time: 41.398s] [Peak RAM: 4431.23 MB] [Paths: 848463]
+  Run 5: [Time: 36.977s] [Peak RAM: 5171.77 MB] [Paths: 848463]
+
+Query 49: match p =  (x)-[Knows+.IsLocatedIn]->(y) return p;
+  Run 1: [Time: 34.840s] [Peak RAM: 4653.33 MB] [Paths: 8836]
+  Run 2: [Time: 24.390s] [Peak RAM: 4305.28 MB] [Paths: 8836]
+  Run 3: [Time: 24.985s] [Peak RAM: 8987.23 MB] [Paths: 8836]
+  Run 4: [Time: 23.810s] [Peak RAM: 8669.17 MB] [Paths: 8836]
+  Run 5: [Time: 24.446s] [Peak RAM: 8840.34 MB] [Paths: 8836]
+
+Query 50: match p =  (x)-[(Knows.ReplyOf)*]->(y) return p;
+  Run 1: [Time: 95.435s] [Peak RAM: 9748.25 MB] [Paths: 2997352]
+  Run 2: [Time: 70.161s] [Peak RAM: 8585.56 MB] [Paths: 2997352]
+  Run 3: [Time: 61.594s] [Peak RAM: 6707.77 MB] [Paths: 2997352]
+  Run 4: [Time: 60.870s] [Peak RAM: 6330.50 MB] [Paths: 2997352]
+  Run 5: [Time: 55.418s] [Peak RAM: 6111.93 MB] [Paths: 2997352]
