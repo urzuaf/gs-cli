@@ -11,6 +11,7 @@ import (
 	"gs-cli/internal/session"
 	"gs-cli/internal/validator"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -49,7 +50,10 @@ func (e *Executor) Execute(in string) {
 }
 
 func (e *Executor) handleMetaCommand(in string) {
-	parts := strings.Fields(in)
+	parts := parseArgs(in)
+	if len(parts) == 0 {
+		return
+	}
 	cmd := parts[0]
 
 	switch cmd {
@@ -110,15 +114,36 @@ func (e *Executor) handleMetaCommand(in string) {
 		fmt.Printf("Display of detailed query results is now: %s\n", status)
 	case "\\benchmark":
 		if len(parts) < 2 {
-			fmt.Println("Usage: \\benchmark <filepath> [--fast]")
+			fmt.Println("Usage: \\benchmark <filepath> [--fast] [--cold] [--restart-cmd \"<cmd>\"] [--name <name>]")
 			return
 		}
-		fast := false
 		filePath := parts[1]
-		if len(parts) > 2 && (parts[2] == "--fast" || parts[2] == "-fast") {
-			fast = true
+		fast := false
+		cold := false
+		restartCmd := ""
+		customName := ""
+
+		for i := 2; i < len(parts); i++ {
+			arg := parts[i]
+			if arg == "--fast" || arg == "-fast" {
+				fast = true
+			} else if arg == "--cold" || arg == "-cold" {
+				cold = true
+			} else if (arg == "--restart-cmd" || arg == "-restart-cmd") && i+1 < len(parts) {
+				restartCmd = parts[i+1]
+				i++
+			} else if (arg == "--name" || arg == "-name") && i+1 < len(parts) {
+				customName = parts[i+1]
+				i++
+			}
 		}
-		e.runBenchmark(filePath, fast)
+
+		if cold && restartCmd == "" {
+			fmt.Println("Error: --restart-cmd is required when using --cold")
+			return
+		}
+
+		e.runBenchmark(filePath, fast, cold, restartCmd, customName)
 	default:
 		fmt.Printf("Unknown meta-command: %s. Use \\q to exit.\n", cmd)
 	}
@@ -328,7 +353,7 @@ func (e *Executor) runQuery(query string) {
 	}
 }
 
-func (e *Executor) runBenchmark(filepath string, fast bool) {
+func (e *Executor) runBenchmark(filepath string, fast bool, cold bool, restartCmd string, customName string) {
 	if e.State.CurrentMode != session.ModeRemote {
 		fmt.Println("Error: Benchmark must be run in remote mode.")
 		return
@@ -366,14 +391,19 @@ func (e *Executor) runBenchmark(filepath string, fast bool) {
 			baseName = baseName[:i]
 		}
 
-		rawFile, err = os.Create(fmt.Sprintf("raw_results_%s.txt", baseName))
+		outputName := baseName
+		if customName != "" {
+			outputName = customName
+		}
+
+		rawFile, err = os.Create(fmt.Sprintf("raw_results_%s.txt", outputName))
 		if err != nil {
 			fmt.Printf("Error creating raw results file: %v\n", err)
 			return
 		}
 		defer rawFile.Close()
 
-		finalFile, err = os.Create(fmt.Sprintf("final_results_%s.txt", baseName))
+		finalFile, err = os.Create(fmt.Sprintf("final_results_%s.txt", outputName))
 		if err != nil {
 			fmt.Printf("Error creating final results file: %v\n", err)
 			return
@@ -400,10 +430,23 @@ func (e *Executor) runBenchmark(filepath string, fast bool) {
 			rawFile.WriteString(fmt.Sprintf("\nQuery %d: %s\n", i+1, query))
 		}
 
+		if cold {
+			fmt.Println("Cold run activated. Performing preventive restart...")
+			if err := e.restartServer(restartCmd); err != nil {
+				fmt.Printf("Error restarting server: %v\n", err)
+				if !fast {
+					rawFile.WriteString(fmt.Sprintf("Query %d FAILED: restart server error: %v\n", i+1, err))
+					finalFile.WriteString(fmt.Sprintf("Q%d: FAILED (restart server error: %v)\n", i+1, err))
+				}
+				continue
+			}
+		}
+
 		var times []float64
 		var peakRAMs []float64
 		var pathCounts []int
 		var errors []string
+		serverCrashed := false
 
 		for run := 1; run <= numRuns; run++ {
 			if !fast {
@@ -413,23 +456,47 @@ func (e *Executor) runBenchmark(filepath string, fast bool) {
 			result, err := e.State.Client.Query(e.State.ActiveDB, query, true)
 
 			if err != nil {
-				errMsg := fmt.Sprintf("Error: %v", err)
-				fmt.Println(errMsg)
-				if !fast {
-					rawFile.WriteString(fmt.Sprintf("  Run %d: %s\n", run, errMsg))
-				}
-				errors = append(errors, errMsg)
+				errMsg := err.Error()
 
-				if strings.Contains(errMsg, "timed out") {
-					if !fast {
-						fmt.Println("  Skipping remaining runs for this query due to timeout.")
-					}
+				standardizedErr := errMsg
+				isOOMorCrash := false
+
+				lowerErr := strings.ToLower(errMsg)
+				if strings.Contains(lowerErr, "out of memory") ||
+					strings.Contains(lowerErr, "oom") ||
+					strings.Contains(lowerErr, "memory") ||
+					strings.Contains(lowerErr, "heap") ||
+					strings.Contains(lowerErr, "connection refused") ||
+					strings.Contains(lowerErr, "eof") ||
+					strings.Contains(lowerErr, "broken pipe") ||
+					strings.Contains(lowerErr, "connection reset") ||
+					strings.Contains(lowerErr, "not reachable") {
+					standardizedErr = "FAILED (OOM)"
+					isOOMorCrash = true
+				} else if strings.Contains(lowerErr, "timed out") ||
+					strings.Contains(lowerErr, "timeout") ||
+					strings.Contains(lowerErr, "deadline exceeded") {
+					standardizedErr = "FAILED (TIMEOUT after 120s)"
+				} else {
+					standardizedErr = fmt.Sprintf("FAILED (%s)", errMsg)
+				}
+
+				fmt.Println(standardizedErr)
+				if !fast {
+					rawFile.WriteString(fmt.Sprintf("  Run %d: %s\n", run, standardizedErr))
+				}
+				errors = append(errors, standardizedErr)
+
+				if isOOMorCrash || strings.Contains(lowerErr, "connection refused") || strings.Contains(lowerErr, "eof") || strings.Contains(lowerErr, "not reachable") {
+					fmt.Println("  CRITICAL ERROR: Server crashed or is unreachable. Skipping remaining runs for this query.")
+					serverCrashed = true
 					break
 				}
 
-				if strings.Contains(errMsg, "server is not reachable") || strings.Contains(errMsg, "connection refused") || strings.Contains(errMsg, "EOF") {
-					fmt.Println("  CRITICAL ERROR: Server seems to have crashed. Skipping remaining runs for this query.")
-					time.Sleep(2 * time.Second)
+				if strings.Contains(standardizedErr, "TIMEOUT") {
+					if !fast {
+						fmt.Println("  Skipping remaining runs for this query due to timeout.")
+					}
 					break
 				}
 				continue
@@ -464,18 +531,35 @@ func (e *Executor) runBenchmark(filepath string, fast bool) {
 			}
 		}
 
+		if serverCrashed && cold {
+			fmt.Println("Server crashed. Performing autonomous recovery restart...")
+			if err := e.restartServer(restartCmd); err != nil {
+				fmt.Printf("Error recovering server: %v\n", err)
+			}
+		}
+
 		if !fast {
-			if len(errors) == numRuns || (len(errors) > 0 && len(times) == 0) {
-				finalFile.WriteString(fmt.Sprintf("Q%d: FAILED (%s)\n", i+1, errors[0]))
+			if len(times) == 0 {
+				finalErr := "FAILED"
+				if len(errors) > 0 {
+					finalErr = errors[0]
+				}
+				finalFile.WriteString(fmt.Sprintf("Q%d: %s\n", i+1, finalErr))
 				continue
 			}
 
-			if len(times) >= 3 {
+			var avgTime, avgRam float64
+			paths := 0
+			if len(pathCounts) > 0 {
+				paths = pathCounts[0]
+			}
+
+			if len(times) == 5 {
 				sort.Float64s(times)
 				sort.Float64s(peakRAMs)
 
-				validTimes := times[1 : len(times)-1]
-				validRams := peakRAMs[1 : len(peakRAMs)-1]
+				validTimes := times[1:4]
+				validRams := peakRAMs[1:4]
 
 				var sumTime, sumRam float64
 				for _, v := range validTimes {
@@ -485,24 +569,65 @@ func (e *Executor) runBenchmark(filepath string, fast bool) {
 					sumRam += v
 				}
 
-				avgTime := sumTime / float64(len(validTimes))
-				avgRam := sumRam / float64(len(validRams))
-
-				paths := 0
-				if len(pathCounts) > 0 {
-					paths = pathCounts[0]
-				}
-
-				finalFile.WriteString(fmt.Sprintf("Q%d: [Avg Time: %.3fs] [Avg Peak RAM: %.2f MB] [Paths: %d]\n", i+1, avgTime, avgRam, paths))
+				avgTime = sumTime / 3.0
+				avgRam = sumRam / 3.0
+			} else if len(times) == 1 {
+				avgTime = times[0]
+				avgRam = peakRAMs[0]
 			} else {
-				finalFile.WriteString(fmt.Sprintf("Q%d: INCOMPLETE (Not enough successful runs to average)\n", i+1))
+				var sumTime, sumRam float64
+				for _, v := range times {
+					sumTime += v
+				}
+				for _, v := range peakRAMs {
+					sumRam += v
+				}
+				avgTime = sumTime / float64(len(times))
+				avgRam = sumRam / float64(len(peakRAMs))
 			}
+
+			finalFile.WriteString(fmt.Sprintf("Q%d: [Avg Time: %.3fs] [Avg Peak RAM: %.2f MB] [Paths: %d]\n", i+1, avgTime, avgRam, paths))
 		}
 	}
 	if fast {
 		fmt.Println("Fast Benchmark complete.")
 	} else {
 		fmt.Println("Benchmark complete. Results saved.")
+	}
+}
+
+func (e *Executor) restartServer(restartCmd string) error {
+	fmt.Printf("Executing restart command: %s\n", restartCmd)
+	cmd := exec.Command("sh", "-c", restartCmd)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Warning: restart command returned error: %v, output: %s\n", err, string(output))
+	}
+
+	fmt.Println("Waiting for server to start (polling)...")
+	ticker := time.NewTicker(500 * time.Millisecond)
+	defer ticker.Stop()
+	timeout := time.After(60 * time.Second)
+
+	for {
+		select {
+		case <-ticker.C:
+			if ok, err := e.State.Client.CheckStatus(); err == nil && ok {
+				fmt.Println("Server is up and running.")
+				if e.State.ActiveDB != "" {
+					fmt.Printf("Restoring active database: %s...\n", e.State.ActiveDB)
+					_, err := e.State.Client.UseDatabase(e.State.ActiveDB)
+					if err != nil {
+						fmt.Printf("Warning: failed to restore database: %v\n", err)
+					} else {
+						fmt.Println("Database restored successfully.")
+					}
+				}
+				return nil
+			}
+		case <-timeout:
+			return fmt.Errorf("timeout waiting for server to start (60s)")
+		}
 	}
 }
 
@@ -537,6 +662,44 @@ func (e *Executor) describe() {
 	} else {
 		fmt.Println("Select a database first.")
 	}
+}
+
+func parseArgs(in string) []string {
+	var args []string
+	var current strings.Builder
+	inQuote := false
+	var quoteChar rune
+
+	runes := []rune(in)
+	for i := 0; i < len(runes); i++ {
+		r := runes[i]
+		if inQuote {
+			if r == quoteChar {
+				inQuote = false
+			} else if r == '\\' && i+1 < len(runes) {
+				i++
+				current.WriteRune(runes[i])
+			} else {
+				current.WriteRune(r)
+			}
+		} else {
+			if r == ' ' || r == '\t' {
+				if current.Len() > 0 {
+					args = append(args, current.String())
+					current.Reset()
+				}
+			} else if r == '"' || r == '\'' {
+				inQuote = true
+				quoteChar = r
+			} else {
+				current.WriteRune(r)
+			}
+		}
+	}
+	if current.Len() > 0 {
+		args = append(args, current.String())
+	}
+	return args
 }
 
 func isNumber(s string) bool {
