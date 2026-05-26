@@ -1,0 +1,52 @@
+Benchmark Averages on DB: sf1
+--------------------------------------------------
+Q1: [Avg Time: 0.116s] [Avg Peak RAM: 5927.19 MB] [Paths: 100]
+Q2: [Avg Time: 0.168s] [Avg Peak RAM: 5965.06 MB] [Paths: 100]
+Q3: [Avg Time: 0.032s] [Avg Peak RAM: 5840.44 MB] [Paths: 100]
+Q4: [Avg Time: 0.056s] [Avg Peak RAM: 5860.68 MB] [Paths: 100]
+Q5: [Avg Time: 0.005s] [Avg Peak RAM: 5812.27 MB] [Paths: 100]
+Q6: [Avg Time: 4.972s] [Avg Peak RAM: 6116.03 MB] [Paths: 44]
+Q7: [Avg Time: 0.003s] [Avg Peak RAM: 5812.20 MB] [Paths: 100]
+Q8: [Avg Time: 0.004s] [Avg Peak RAM: 5813.03 MB] [Paths: 100]
+Q9: [Avg Time: 0.003s] [Avg Peak RAM: 5812.74 MB] [Paths: 100]
+Q10: [Avg Time: 0.003s] [Avg Peak RAM: 5812.15 MB] [Paths: 100]
+Q11: [Avg Time: 0.140s] [Avg Peak RAM: 5927.77 MB] [Paths: 100]
+Q12: FAILED (OOM)
+Q13: FAILED (OOM)
+Q14: FAILED (OOM)
+Q15: FAILED (OOM)
+Q16: FAILED (OOM)
+Q17: FAILED (OOM)
+Q18: FAILED (OOM)
+Q19: FAILED (OOM)
+Q20: [Avg Time: 8.780s] [Avg Peak RAM: 6517.47 MB] [Paths: 100]
+Q21: [Avg Time: 0.004s] [Avg Peak RAM: 5811.93 MB] [Paths: 100]
+Q22: [Avg Time: 0.004s] [Avg Peak RAM: 5812.17 MB] [Paths: 100]
+Q23: [Avg Time: 0.003s] [Avg Peak RAM: 5812.18 MB] [Paths: 100]
+Q24: [Avg Time: 0.003s] [Avg Peak RAM: 5812.85 MB] [Paths: 100]
+Q25: [Avg Time: 0.004s] [Avg Peak RAM: 5812.54 MB] [Paths: 100]
+Q26: [Avg Time: 0.003s] [Avg Peak RAM: 5812.27 MB] [Paths: 100]
+Q27: [Avg Time: 0.003s] [Avg Peak RAM: 5812.07 MB] [Paths: 100]
+Q28: [Avg Time: 0.004s] [Avg Peak RAM: 5813.23 MB] [Paths: 100]
+Q29: [Avg Time: 0.003s] [Avg Peak RAM: 5811.76 MB] [Paths: 100]
+Q30: [Avg Time: 0.003s] [Avg Peak RAM: 5812.54 MB] [Paths: 100]
+Q31: [Avg Time: 0.133s] [Avg Peak RAM: 5927.98 MB] [Paths: 100]
+Q32: FAILED (OOM)
+Q33: FAILED (OOM)
+Q34: [Avg Time: 0.132s] [Avg Peak RAM: 5926.23 MB] [Paths: 100]
+Q35: [Avg Time: 0.002s] [Avg Peak RAM: 5715.05 MB] [Paths: 0]
+Q36: FAILED (OOM)
+Q37: FAILED (OOM)
+Q38: FAILED (OOM)
+Q39: [Avg Time: 0.012s] [Avg Peak RAM: 5818.34 MB] [Paths: 100]
+Q40: [Avg Time: 0.024s] [Avg Peak RAM: 5828.03 MB] [Paths: 100]
+Q41: FAILED (OOM)
+Q42: [Avg Time: 0.050s] [Avg Peak RAM: 5852.76 MB] [Paths: 100]
+Q43: FAILED (OOM)
+Q44: FAILED (OOM)
+Q45: FAILED (OOM)
+Q46: FAILED (OOM)
+Q47: FAILED (OOM)
+Q48: [Avg Time: 0.006s] [Avg Peak RAM: 5811.76 MB] [Paths: 100]
+Q49: FAILED (OOM)
+Q50: [Avg Time: 5.591s] [Avg Peak RAM: 6523.73 MB] [Paths: 100]
