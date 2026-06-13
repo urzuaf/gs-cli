@@ -476,7 +476,7 @@ func (e *Executor) runBenchmark(filepath string, fast bool, cold bool, restartCm
 				} else if strings.Contains(lowerErr, "timed out") ||
 					strings.Contains(lowerErr, "timeout") ||
 					strings.Contains(lowerErr, "deadline exceeded") {
-					standardizedErr = "FAILED (TIMEOUT after 120s)"
+					standardizedErr = "FAILED (TIMEOUT after 300s)"
 				} else {
 					standardizedErr = fmt.Sprintf("FAILED (%s)", errMsg)
 				}

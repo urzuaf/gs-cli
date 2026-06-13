@@ -3,3 +3,4 @@ toy
 *.pgdf
 *OPTIMIZATION.md
 resultados2
+.DS_Store
