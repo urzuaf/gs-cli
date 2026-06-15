@@ -1,0 +1,167 @@
+Benchmark Averages on DB: sf1
+--------------------------------------------------
+Q1: [Avg Time: 10.375s] [Avg Peak RAM: 6074.66 MB] [Paths: 2]
+Q2: FAILED (OOM)
+Q3: FAILED (OOM)
+Q4: [Avg Time: 8.499s] [Avg Peak RAM: 6074.63 MB] [Paths: 1]
+Q5: FAILED (OOM)
+Q6: FAILED (OOM)
+Q7: [Avg Time: 12.456s] [Avg Peak RAM: 6074.33 MB] [Paths: 7]
+Q8: FAILED (OOM)
+Q9: FAILED (OOM)
+Q10: [Avg Time: 12.073s] [Avg Peak RAM: 6073.52 MB] [Paths: 2]
+Q11: FAILED (OOM)
+Q12: FAILED (OOM)
+Q13: [Avg Time: 16.277s] [Avg Peak RAM: 6075.45 MB] [Paths: 8]
+Q14: FAILED (OOM)
+Q15: FAILED (OOM)
+Q16: [Avg Time: 12.319s] [Avg Peak RAM: 6074.06 MB] [Paths: 2]
+Q17: FAILED (OOM)
+Q18: FAILED (OOM)
+Q19: [Avg Time: 16.571s] [Avg Peak RAM: 6074.70 MB] [Paths: 8]
+Q20: FAILED (OOM)
+Q21: FAILED (OOM)
+Q22: [Avg Time: 18.651s] [Avg Peak RAM: 6074.15 MB] [Paths: 8]
+Q23: FAILED (OOM)
+Q24: FAILED (OOM)
+Q25: FAILED (OOM)
+Q26: FAILED (OOM)
+Q27: FAILED (OOM)
+Q28: FAILED (OOM)
+Q29: FAILED (OOM)
+Q30: FAILED (OOM)
+Q31: FAILED (OOM)
+Q32: FAILED (OOM)
+Q33: FAILED (OOM)
+Q34: FAILED (OOM)
+Q35: FAILED (OOM)
+Q36: FAILED (OOM)
+Q37: FAILED (OOM)
+Q38: FAILED (OOM)
+Q39: FAILED (OOM)
+Q40: [Avg Time: 5.438s] [Avg Peak RAM: 6075.03 MB] [Paths: 1829]
+Q41: FAILED (OOM)
+Q42: FAILED (OOM)
+Q43: FAILED (OOM)
+Q44: FAILED (OOM)
+Q45: FAILED (OOM)
+Q46: FAILED (OOM)
+Q47: FAILED (OOM)
+Q48: FAILED (OOM)
+Q49: FAILED (OOM)
+Q50: FAILED (OOM)
+Q51: FAILED (OOM)
+Q52: FAILED (OOM)
+Q53: FAILED (OOM)
+Q54: FAILED (OOM)
+Q55: FAILED (OOM)
+Q56: FAILED (OOM)
+Q57: FAILED (OOM)
+Q58: FAILED (OOM)
+Q59: FAILED (OOM)
+Q60: FAILED (OOM)
+Q61: [Avg Time: 0.318s] [Avg Peak RAM: 6019.09 MB] [Paths: 19]
+Q62: FAILED (OOM)
+Q63: FAILED (OOM)
+Q64: FAILED (OOM)
+Q65: FAILED (OOM)
+Q66: FAILED (OOM)
+Q67: FAILED (OOM)
+Q68: FAILED (OOM)
+Q69: FAILED (OOM)
+Q70: FAILED (OOM)
+Q71: FAILED (OOM)
+Q72: [Avg Time: 0.187s] [Avg Peak RAM: 5922.76 MB] [Paths: 100000]
+Q73: [Avg Time: 0.313s] [Avg Peak RAM: 6018.87 MB] [Paths: 19]
+Q74: FAILED (OOM)
+Q75: FAILED (OOM)
+Q76: [Avg Time: 3.966s] [Avg Peak RAM: 6074.93 MB] [Paths: 75]
+Q77: FAILED (OOM)
+Q78: FAILED (OOM)
+Q79: FAILED (OOM)
+Q80: FAILED (OOM)
+Q81: FAILED (OOM)
+Q82: FAILED (OOM)
+Q83: FAILED (OOM)
+Q84: FAILED (OOM)
+Q85: FAILED (OOM)
+Q86: FAILED (OOM)
+Q87: FAILED (OOM)
+Q88: FAILED (OOM)
+Q89: FAILED (OOM)
+Q90: FAILED (OOM)
+Q91: FAILED (OOM)
+Q92: FAILED (OOM)
+Q93: FAILED (OOM)
+Q94: FAILED (OOM)
+Q95: FAILED (OOM)
+Q96: FAILED (OOM)
+Q97: FAILED (OOM)
+Q98: FAILED (OOM)
+Q99: FAILED (OOM)
+Q100: [Avg Time: 8.078s] [Avg Peak RAM: 6075.24 MB] [Paths: 76]
+Q101: FAILED (OOM)
+Q102: FAILED (OOM)
+Q103: FAILED (OOM)
+Q104: FAILED (OOM)
+Q105: FAILED (OOM)
+Q106: FAILED (OOM)
+Q107: FAILED (OOM)
+Q108: FAILED (OOM)
+Q109: [Avg Time: 4.513s] [Avg Peak RAM: 6074.73 MB] [Paths: 119]
+Q110: FAILED (OOM)
+Q111: FAILED (OOM)
+Q112: [Avg Time: 4.795s] [Avg Peak RAM: 6075.27 MB] [Paths: 47]
+Q113: FAILED (OOM)
+Q114: FAILED (OOM)
+Q115: FAILED (OOM)
+Q116: FAILED (OOM)
+Q117: [Avg Time: 0.202s] [Avg Peak RAM: 5938.95 MB] [Paths: 100000]
+Q118: FAILED (OOM)
+Q119: FAILED (OOM)
+Q120: FAILED (OOM)
+Q121: [Avg Time: 4.481s] [Avg Peak RAM: 6074.47 MB] [Paths: 3]
+Q122: FAILED (OOM)
+Q123: [Avg Time: 0.119s] [Avg Peak RAM: 5874.26 MB] [Paths: 100000]
+Q124: [Avg Time: 0.006s] [Avg Peak RAM: 5771.10 MB] [Paths: 2]
+Q125: [Avg Time: 0.013s] [Avg Peak RAM: 5774.85 MB] [Paths: 1454]
+Q126: [Avg Time: 0.012s] [Avg Peak RAM: 5774.76 MB] [Paths: 1565]
+Q127: FAILED (OOM)
+Q128: FAILED (OOM)
+Q129: [Avg Time: 0.068s] [Avg Peak RAM: 5806.48 MB] [Paths: 100000]
+Q130: [Avg Time: 0.007s] [Avg Peak RAM: 5771.06 MB] [Paths: 1]
+Q131: [Avg Time: 0.008s] [Avg Peak RAM: 5772.53 MB] [Paths: 111]
+Q132: [Avg Time: 0.006s] [Avg Peak RAM: 5770.29 MB] [Paths: 111]
+Q133: [Avg Time: 0.069s] [Avg Peak RAM: 5829.86 MB] [Paths: 3]
+Q134: [Avg Time: 0.123s] [Avg Peak RAM: 5878.72 MB] [Paths: 15348]
+Q135: [Avg Time: 0.119s] [Avg Peak RAM: 5875.68 MB] [Paths: 30353]
+Q136: [Avg Time: 4.326s] [Avg Peak RAM: 6074.41 MB] [Paths: 2]
+Q137: FAILED (OOM)
+Q138: [Avg Time: 0.052s] [Avg Peak RAM: 5809.79 MB] [Paths: 100000]
+Q139: [Avg Time: 4.138s] [Avg Peak RAM: 6074.52 MB] [Paths: 2]
+Q140: FAILED (OOM)
+Q141: FAILED (OOM)
+Q142: [Avg Time: 0.008s] [Avg Peak RAM: 5771.71 MB] [Paths: 1]
+Q143: [Avg Time: 0.010s] [Avg Peak RAM: 5774.72 MB] [Paths: 111]
+Q144: [Avg Time: 0.007s] [Avg Peak RAM: 5773.86 MB] [Paths: 111]
+Q145: [Avg Time: 3.957s] [Avg Peak RAM: 6076.02 MB] [Paths: 2]
+Q146: FAILED (OOM)
+Q147: FAILED (OOM)
+Q148: [Avg Time: 0.880s] [Avg Peak RAM: 6075.98 MB] [Paths: 2]
+Q149: [Avg Time: 0.837s] [Avg Peak RAM: 6075.50 MB] [Paths: 1454]
+Q150: [Avg Time: 1.088s] [Avg Peak RAM: 6075.28 MB] [Paths: 1565]
+Q151: [Avg Time: 0.009s] [Avg Peak RAM: 5773.29 MB] [Paths: 1]
+Q152: [Avg Time: 0.009s] [Avg Peak RAM: 5774.62 MB] [Paths: 111]
+Q153: [Avg Time: 0.007s] [Avg Peak RAM: 5774.01 MB] [Paths: 111]
+Q154: [Avg Time: 1.153s] [Avg Peak RAM: 6075.40 MB] [Paths: 2]
+Q155: FAILED (OOM)
+Q156: [Avg Time: 0.843s] [Avg Peak RAM: 6076.73 MB] [Paths: 1565]
+Q157: [Avg Time: 4.017s] [Avg Peak RAM: 6074.45 MB] [Paths: 4]
+Q158: FAILED (OOM)
+Q159: [Avg Time: 0.103s] [Avg Peak RAM: 5833.71 MB] [Paths: 100000]
+Q160: [Avg Time: 3.927s] [Avg Peak RAM: 6074.68 MB] [Paths: 4]
+Q161: FAILED (OOM)
+Q162: [Avg Time: 0.143s] [Avg Peak RAM: 5901.27 MB] [Paths: 100000]
+Q163: [Avg Time: 0.008s] [Avg Peak RAM: 5770.57 MB] [Paths: 1]
+Q164: [Avg Time: 0.009s] [Avg Peak RAM: 5774.08 MB] [Paths: 111]
+Q165: [Avg Time: 0.008s] [Avg Peak RAM: 5770.78 MB] [Paths: 111]

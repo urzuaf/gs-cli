@@ -1,0 +1,701 @@
+Benchmark on DB: sf1
+--------------------------------------------------
+
+Query 1: match p = (x)-[HasCreator?]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 9.894s] [Peak RAM: 6082.40 MB] [Paths: 2]
+  Run 2: [Time: 10.601s] [Peak RAM: 6074.54 MB] [Paths: 2]
+  Run 3: [Time: 10.326s] [Peak RAM: 6074.59 MB] [Paths: 2]
+  Run 4: [Time: 10.199s] [Peak RAM: 6074.65 MB] [Paths: 2]
+  Run 5: [Time: 10.759s] [Peak RAM: 6074.75 MB] [Paths: 2]
+
+Query 2: match p = (x)-[HasCreator?]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 3: match p = (x)-[HasCreator?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 4: match p = (x)-[HasCreator.IsLocatedIn]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 9.487s] [Peak RAM: 6082.42 MB] [Paths: 1]
+  Run 2: [Time: 8.838s] [Peak RAM: 6074.56 MB] [Paths: 1]
+  Run 3: [Time: 8.567s] [Peak RAM: 6074.61 MB] [Paths: 1]
+  Run 4: [Time: 8.092s] [Peak RAM: 6074.63 MB] [Paths: 1]
+  Run 5: [Time: 7.482s] [Peak RAM: 6074.64 MB] [Paths: 1]
+
+Query 5: match p = (x)-[HasCreator.IsLocatedIn]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 6: match p = (x)-[HasCreator.IsLocatedIn]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 7: match p = (x)-[HasCreator|HasTag]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 13.464s] [Peak RAM: 6082.14 MB] [Paths: 7]
+  Run 2: [Time: 12.250s] [Peak RAM: 6074.27 MB] [Paths: 7]
+  Run 3: [Time: 11.692s] [Peak RAM: 6074.31 MB] [Paths: 7]
+  Run 4: [Time: 13.219s] [Peak RAM: 6074.33 MB] [Paths: 7]
+  Run 5: [Time: 11.900s] [Peak RAM: 6074.34 MB] [Paths: 7]
+
+Query 8: match p = (x)-[HasCreator|HasTag]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 9: match p = (x)-[HasCreator|HasTag]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 10: match p = (x)-[(HasCreator.IsLocatedIn)?]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 12.279s] [Peak RAM: 6079.47 MB] [Paths: 2]
+  Run 2: [Time: 13.040s] [Peak RAM: 6073.70 MB] [Paths: 2]
+  Run 3: [Time: 12.228s] [Peak RAM: 6073.38 MB] [Paths: 2]
+  Run 4: [Time: 11.713s] [Peak RAM: 6073.42 MB] [Paths: 2]
+  Run 5: [Time: 11.542s] [Peak RAM: 6073.43 MB] [Paths: 2]
+
+Query 11: match p = (x)-[(HasCreator.IsLocatedIn)?]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 12: match p = (x)-[(HasCreator.IsLocatedIn)?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 13: match p = (x)-[(HasCreator|HasTag)?]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 17.886s] [Peak RAM: 6083.19 MB] [Paths: 8]
+  Run 2: [Time: 16.766s] [Peak RAM: 6075.31 MB] [Paths: 8]
+  Run 3: [Time: 15.448s] [Peak RAM: 6075.36 MB] [Paths: 8]
+  Run 4: [Time: 15.597s] [Peak RAM: 6075.48 MB] [Paths: 8]
+  Run 5: [Time: 16.467s] [Peak RAM: 6075.51 MB] [Paths: 8]
+
+Query 14: match p = (x)-[(HasCreator|HasTag)?]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 15: match p = (x)-[(HasCreator|HasTag)?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 16: match p = (x)-[HasCreator?.IsLocatedIn]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 12.964s] [Peak RAM: 6079.85 MB] [Paths: 2]
+  Run 2: [Time: 12.317s] [Peak RAM: 6074.00 MB] [Paths: 2]
+  Run 3: [Time: 11.500s] [Peak RAM: 6074.03 MB] [Paths: 2]
+  Run 4: [Time: 11.900s] [Peak RAM: 6074.05 MB] [Paths: 2]
+  Run 5: [Time: 12.739s] [Peak RAM: 6074.09 MB] [Paths: 2]
+
+Query 17: match p = (x)-[HasCreator?.IsLocatedIn]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 18: match p = (x)-[HasCreator?.IsLocatedIn]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 19: match p = (x)-[HasCreator?|HasTag]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 17.274s] [Peak RAM: 6080.74 MB] [Paths: 8]
+  Run 2: [Time: 17.169s] [Peak RAM: 6074.59 MB] [Paths: 8]
+  Run 3: [Time: 15.855s] [Peak RAM: 6074.68 MB] [Paths: 8]
+  Run 4: [Time: 14.765s] [Peak RAM: 6074.74 MB] [Paths: 8]
+  Run 5: [Time: 16.689s] [Peak RAM: 6074.69 MB] [Paths: 8]
+
+Query 20: match p = (x)-[HasCreator?|HasTag]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 21: match p = (x)-[HasCreator?|HasTag]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 22: match p = (x)-[((HasCreator|HasTag)|IsLocatedIn)]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: [Time: 19.714s] [Peak RAM: 6079.95 MB] [Paths: 8]
+  Run 2: [Time: 18.717s] [Peak RAM: 6074.10 MB] [Paths: 8]
+  Run 3: [Time: 16.432s] [Peak RAM: 6074.13 MB] [Paths: 8]
+  Run 4: [Time: 18.918s] [Peak RAM: 6074.16 MB] [Paths: 8]
+  Run 5: [Time: 18.317s] [Peak RAM: 6074.17 MB] [Paths: 8]
+
+Query 23: match p = (x)-[((HasCreator|HasTag)|IsLocatedIn)]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 24: match p = (x)-[((HasCreator|HasTag)|IsLocatedIn)]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 25: match p = (x)-[(Likes.HasCreator)+]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 26: match p = (x)-[(Likes.HasCreator)+]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 27: match p = (x)-[(Likes.HasCreator)+]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 28: match p = (x)-[(Likes.HasCreator)*]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 29: match p = (x)-[(Likes.HasCreator)*]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 30: match p = (x)-[(Likes.HasCreator)*]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 31: match p = (x)-[ReplyOf+.HasTag]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 32: match p = (x)-[ReplyOf+.HasTag]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 33: match p = (x)-[ReplyOf+.HasTag]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 34: match p = (x)-[ReplyOf*.HasTag]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 35: match p = (x)-[ReplyOf*.HasTag]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 36: match p = (x)-[ReplyOf*.HasTag]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 37: match p = (x)-[Likes.HasCreator?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 38: match p = (x)-[Likes.HasCreator?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 39: match p = (x)-[Likes.HasCreator?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 40: match p = (x)-[HasMember.Knows?]->(y) WHERE x.id = "forum_0" return p limit 100000;
+  Run 1: [Time: 5.459s] [Peak RAM: 6082.50 MB] [Paths: 1829]
+  Run 2: [Time: 5.333s] [Peak RAM: 6074.98 MB] [Paths: 1829]
+  Run 3: [Time: 5.520s] [Peak RAM: 6075.01 MB] [Paths: 1829]
+  Run 4: [Time: 5.966s] [Peak RAM: 6075.04 MB] [Paths: 1829]
+  Run 5: [Time: 5.334s] [Peak RAM: 6075.04 MB] [Paths: 1829]
+
+Query 41: match p = (x)-[HasMember.Knows?]->(y) WHERE x.creationDate > 1320000000000 return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 42: match p = (x)-[HasMember.Knows?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 43: match p = (x)-[HasMember.Knows+]->(y) WHERE x.id = "forum_0" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 44: match p = (x)-[HasMember.Knows+]->(y) WHERE x.creationDate > 1320000000000 return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 45: match p = (x)-[HasMember.Knows+]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 46: match p = (x)-[HasMember.Knows*]->(y) WHERE x.id = "forum_0" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 47: match p = (x)-[HasMember.Knows*]->(y) WHERE x.creationDate > 1320000000000 return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 48: match p = (x)-[HasMember.Knows*]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 49: match p = (x)-[ReplyOf+|HasCreator]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 50: match p = (x)-[ReplyOf+|HasCreator]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 51: match p = (x)-[ReplyOf+|HasCreator]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 52: match p = (x)-[ReplyOf*|HasTag]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 53: match p = (x)-[ReplyOf*|HasTag]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 54: match p = (x)-[ReplyOf*|HasTag]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 55: match p = (x)-[IsLocatedIn|HasInterest?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 56: match p = (x)-[IsLocatedIn|HasInterest?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 57: match p = (x)-[IsLocatedIn|HasInterest?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 58: match p = (x)-[((Likes.HasCreator).Likes)]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 59: match p = (x)-[((Likes.HasCreator).Likes)]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 60: match p = (x)-[((Likes.HasCreator).Likes)]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 61: match p = (x)-[((HasModerator.Knows).IsLocatedIn)]->(y) WHERE x.id = "forum_0" return p limit 100000;
+  Run 1: [Time: 0.402s] [Peak RAM: 6022.57 MB] [Paths: 19]
+  Run 2: [Time: 0.399s] [Peak RAM: 6019.00 MB] [Paths: 19]
+  Run 3: [Time: 0.296s] [Peak RAM: 6019.05 MB] [Paths: 19]
+  Run 4: [Time: 0.259s] [Peak RAM: 6019.09 MB] [Paths: 19]
+  Run 5: [Time: 0.260s] [Peak RAM: 6019.13 MB] [Paths: 19]
+
+Query 62: match p = (x)-[((HasModerator.Knows).IsLocatedIn)]->(y) WHERE x.creationDate > 1320000000000 return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 63: match p = (x)-[((HasModerator.Knows).IsLocatedIn)]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 64: match p = (x)-[Knows?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 65: match p = (x)-[Knows?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 66: match p = (x)-[Knows?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 67: match p = (x)-[Knows+]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 68: match p = (x)-[Knows+]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 69: match p = (x)-[Knows+]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 70: match p = (x)-[Knows*]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 71: match p = (x)-[Knows*]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 72: match p = (x)-[Knows*]->(y) return p limit 100000;
+  Run 1: [Time: 0.268s] [Peak RAM: 5926.28 MB] [Paths: 100000]
+  Run 2: [Time: 0.179s] [Peak RAM: 5922.70 MB] [Paths: 100000]
+  Run 3: [Time: 0.182s] [Peak RAM: 5922.74 MB] [Paths: 100000]
+  Run 4: [Time: 0.201s] [Peak RAM: 5922.77 MB] [Paths: 100000]
+  Run 5: [Time: 0.170s] [Peak RAM: 5922.78 MB] [Paths: 100000]
+
+Query 73: match p = (x)-[HasModerator.Knows]->(y) WHERE x.id = "forum_0" return p limit 100000;
+  Run 1: [Time: 0.533s] [Peak RAM: 6022.56 MB] [Paths: 19]
+  Run 2: [Time: 0.349s] [Peak RAM: 6018.79 MB] [Paths: 19]
+  Run 3: [Time: 0.295s] [Peak RAM: 6018.84 MB] [Paths: 19]
+  Run 4: [Time: 0.295s] [Peak RAM: 6018.88 MB] [Paths: 19]
+  Run 5: [Time: 0.294s] [Peak RAM: 6018.89 MB] [Paths: 19]
+
+Query 74: match p = (x)-[HasModerator.Knows]->(y) WHERE x.creationDate > 1320000000000 return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 75: match p = (x)-[HasModerator.Knows]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 76: match p = (x)-[Likes|Knows]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 4.421s] [Peak RAM: 6082.38 MB] [Paths: 75]
+  Run 2: [Time: 3.999s] [Peak RAM: 6074.89 MB] [Paths: 75]
+  Run 3: [Time: 3.947s] [Peak RAM: 6074.91 MB] [Paths: 75]
+  Run 4: [Time: 3.876s] [Peak RAM: 6074.94 MB] [Paths: 75]
+  Run 5: [Time: 3.951s] [Peak RAM: 6074.94 MB] [Paths: 75]
+
+Query 77: match p = (x)-[Likes|Knows]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 78: match p = (x)-[Likes|Knows]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 79: match p = (x)-[(Knows.Likes)?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 80: match p = (x)-[(Knows.Likes)?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 81: match p = (x)-[(Knows.Likes)?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 82: match p = (x)-[(Likes|Knows)+]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 83: match p = (x)-[(Likes|Knows)+]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 84: match p = (x)-[(Likes|Knows)+]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 85: match p = (x)-[Knows?.Likes]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 86: match p = (x)-[Knows?.Likes]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 87: match p = (x)-[Knows?.Likes]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 88: match p = (x)-[Knows+.Likes]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 89: match p = (x)-[Knows+.Likes]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 90: match p = (x)-[Knows+.Likes]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 91: match p = (x)-[Knows*.Likes]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 92: match p = (x)-[Knows*.Likes]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 93: match p = (x)-[Knows*.Likes]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 94: match p = (x)-[ReplyOf.ReplyOf+]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 95: match p = (x)-[ReplyOf.ReplyOf+]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 96: match p = (x)-[ReplyOf.ReplyOf+]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 97: match p = (x)-[ReplyOf.ReplyOf*]->(y) WHERE x.id = "comment_1099511870409" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 98: match p = (x)-[ReplyOf.ReplyOf*]->(y) WHERE x.browserUsed = "Firefox" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 99: match p = (x)-[ReplyOf.ReplyOf*]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 100: match p = (x)-[Likes|Knows?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 8.379s] [Peak RAM: 6083.04 MB] [Paths: 76]
+  Run 2: [Time: 8.727s] [Peak RAM: 6075.17 MB] [Paths: 76]
+  Run 3: [Time: 7.754s] [Peak RAM: 6075.21 MB] [Paths: 76]
+  Run 4: [Time: 8.053s] [Peak RAM: 6075.25 MB] [Paths: 76]
+  Run 5: [Time: 7.802s] [Peak RAM: 6075.26 MB] [Paths: 76]
+
+Query 101: match p = (x)-[Likes|Knows?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 102: match p = (x)-[Likes|Knows?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 103: match p = (x)-[Likes|ReplyOf+]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 104: match p = (x)-[Likes|ReplyOf+]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 105: match p = (x)-[Likes|ReplyOf+]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 106: match p = (x)-[Likes|ReplyOf*]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 107: match p = (x)-[Likes|ReplyOf*]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 108: match p = (x)-[Likes|ReplyOf*]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 109: match p = (x)-[((Likes|Knows)|HasInterest)]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 4.556s] [Peak RAM: 6080.19 MB] [Paths: 119]
+  Run 2: [Time: 4.525s] [Peak RAM: 6074.68 MB] [Paths: 119]
+  Run 3: [Time: 4.419s] [Peak RAM: 6074.70 MB] [Paths: 119]
+  Run 4: [Time: 4.459s] [Peak RAM: 6074.74 MB] [Paths: 119]
+  Run 5: [Time: 4.583s] [Peak RAM: 6074.75 MB] [Paths: 119]
+
+Query 110: match p = (x)-[((Likes|Knows)|HasInterest)]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 111: match p = (x)-[((Likes|Knows)|HasInterest)]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 112: match p = (x)-[(WorkAt|HasInterest)?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 5.044s] [Peak RAM: 6082.74 MB] [Paths: 47]
+  Run 2: [Time: 4.818s] [Peak RAM: 6075.23 MB] [Paths: 47]
+  Run 3: [Time: 5.636s] [Peak RAM: 6075.25 MB] [Paths: 47]
+  Run 4: [Time: 4.522s] [Peak RAM: 6075.27 MB] [Paths: 47]
+  Run 5: [Time: 4.504s] [Peak RAM: 6075.30 MB] [Paths: 47]
+
+Query 113: match p = (x)-[(WorkAt|HasInterest)?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 114: match p = (x)-[(WorkAt|HasInterest)?]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 115: match p = (x)-[(WorkAt|Knows)*]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 116: match p = (x)-[(WorkAt|Knows)*]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 117: match p = (x)-[(WorkAt|Knows)*]->(y) return p limit 100000;
+  Run 1: [Time: 0.308s] [Peak RAM: 5942.36 MB] [Paths: 100000]
+  Run 2: [Time: 0.198s] [Peak RAM: 5938.78 MB] [Paths: 100000]
+  Run 3: [Time: 0.200s] [Peak RAM: 5938.92 MB] [Paths: 100000]
+  Run 4: [Time: 0.201s] [Peak RAM: 5938.95 MB] [Paths: 100000]
+  Run 5: [Time: 0.205s] [Peak RAM: 5938.97 MB] [Paths: 100000]
+
+Query 118: match p = (x)-[Knows?|StudyAt]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 119: match p = (x)-[Knows?|StudyAt]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 120: match p = (x)-[Knows?|StudyAt]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 121: match p = (x)-[WorkAt?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 4.426s] [Peak RAM: 6079.95 MB] [Paths: 3]
+  Run 2: [Time: 4.408s] [Peak RAM: 6074.42 MB] [Paths: 3]
+  Run 3: [Time: 4.951s] [Peak RAM: 6074.44 MB] [Paths: 3]
+  Run 4: [Time: 4.609s] [Peak RAM: 6074.48 MB] [Paths: 3]
+  Run 5: [Time: 3.981s] [Peak RAM: 6074.48 MB] [Paths: 3]
+
+Query 122: match p = (x)-[WorkAt?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 123: match p = (x)-[WorkAt?]->(y) return p limit 100000;
+  Run 1: [Time: 0.234s] [Peak RAM: 5877.75 MB] [Paths: 100000]
+  Run 2: [Time: 0.121s] [Peak RAM: 5874.18 MB] [Paths: 100000]
+  Run 3: [Time: 0.123s] [Peak RAM: 5874.23 MB] [Paths: 100000]
+  Run 4: [Time: 0.112s] [Peak RAM: 5874.27 MB] [Paths: 100000]
+  Run 5: [Time: 0.103s] [Peak RAM: 5874.29 MB] [Paths: 100000]
+
+Query 124: match p = (x)-[IsPartOf+]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 0.094s] [Peak RAM: 5774.56 MB] [Paths: 2]
+  Run 2: [Time: 0.007s] [Peak RAM: 5770.98 MB] [Paths: 2]
+  Run 3: [Time: 0.006s] [Peak RAM: 5771.03 MB] [Paths: 2]
+  Run 4: [Time: 0.006s] [Peak RAM: 5771.09 MB] [Paths: 2]
+  Run 5: [Time: 0.006s] [Peak RAM: 5771.19 MB] [Paths: 2]
+
+Query 125: match p = (x)-[IsPartOf+]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: [Time: 0.098s] [Peak RAM: 5778.35 MB] [Paths: 1454]
+  Run 2: [Time: 0.012s] [Peak RAM: 5774.77 MB] [Paths: 1454]
+  Run 3: [Time: 0.012s] [Peak RAM: 5774.82 MB] [Paths: 1454]
+  Run 4: [Time: 0.014s] [Peak RAM: 5774.85 MB] [Paths: 1454]
+  Run 5: [Time: 0.012s] [Peak RAM: 5774.88 MB] [Paths: 1454]
+
+Query 126: match p = (x)-[IsPartOf+]->(y) return p limit 100000;
+  Run 1: [Time: 0.094s] [Peak RAM: 5778.27 MB] [Paths: 1565]
+  Run 2: [Time: 0.010s] [Peak RAM: 5774.68 MB] [Paths: 1565]
+  Run 3: [Time: 0.010s] [Peak RAM: 5774.73 MB] [Paths: 1565]
+  Run 4: [Time: 0.014s] [Peak RAM: 5774.77 MB] [Paths: 1565]
+  Run 5: [Time: 0.013s] [Peak RAM: 5774.79 MB] [Paths: 1565]
+
+Query 127: match p = (x)-[IsPartOf*]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 128: match p = (x)-[IsPartOf*]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 129: match p = (x)-[IsPartOf*]->(y) return p limit 100000;
+  Run 1: [Time: 0.137s] [Peak RAM: 5810.00 MB] [Paths: 100000]
+  Run 2: [Time: 0.053s] [Peak RAM: 5806.42 MB] [Paths: 100000]
+  Run 3: [Time: 0.051s] [Peak RAM: 5806.46 MB] [Paths: 100000]
+  Run 4: [Time: 0.081s] [Peak RAM: 5806.48 MB] [Paths: 100000]
+  Run 5: [Time: 0.070s] [Peak RAM: 5806.51 MB] [Paths: 100000]
+
+Query 130: match p = (x)-[IsPartOf.IsPartOf]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 0.090s] [Peak RAM: 5774.56 MB] [Paths: 1]
+  Run 2: [Time: 0.006s] [Peak RAM: 5770.98 MB] [Paths: 1]
+  Run 3: [Time: 0.007s] [Peak RAM: 5771.03 MB] [Paths: 1]
+  Run 4: [Time: 0.007s] [Peak RAM: 5771.07 MB] [Paths: 1]
+  Run 5: [Time: 0.006s] [Peak RAM: 5771.09 MB] [Paths: 1]
+
+Query 131: match p = (x)-[IsPartOf.IsPartOf]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: [Time: 0.083s] [Peak RAM: 5777.29 MB] [Paths: 111]
+  Run 2: [Time: 0.009s] [Peak RAM: 5769.72 MB] [Paths: 111]
+  Run 3: [Time: 0.007s] [Peak RAM: 5769.77 MB] [Paths: 111]
+  Run 4: [Time: 0.007s] [Peak RAM: 5773.90 MB] [Paths: 111]
+  Run 5: [Time: 0.008s] [Peak RAM: 5773.92 MB] [Paths: 111]
+
+Query 132: match p = (x)-[IsPartOf.IsPartOf]->(y) return p limit 100000;
+  Run 1: [Time: 0.085s] [Peak RAM: 5773.71 MB] [Paths: 111]
+  Run 2: [Time: 0.006s] [Peak RAM: 5770.23 MB] [Paths: 111]
+  Run 3: [Time: 0.007s] [Peak RAM: 5770.27 MB] [Paths: 111]
+  Run 4: [Time: 0.005s] [Peak RAM: 5770.30 MB] [Paths: 111]
+  Run 5: [Time: 0.005s] [Peak RAM: 5770.30 MB] [Paths: 111]
+
+Query 133: match p = (x)-[WorkAt|StudyAt]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 0.173s] [Peak RAM: 5829.67 MB] [Paths: 3]
+  Run 2: [Time: 0.072s] [Peak RAM: 5825.89 MB] [Paths: 3]
+  Run 3: [Time: 0.067s] [Peak RAM: 5829.94 MB] [Paths: 3]
+  Run 4: [Time: 0.067s] [Peak RAM: 5829.98 MB] [Paths: 3]
+  Run 5: [Time: 0.065s] [Peak RAM: 5830.00 MB] [Paths: 3]
+
+Query 134: match p = (x)-[WorkAt|StudyAt]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: [Time: 0.244s] [Peak RAM: 5882.44 MB] [Paths: 15348]
+  Run 2: [Time: 0.120s] [Peak RAM: 5878.64 MB] [Paths: 15348]
+  Run 3: [Time: 0.114s] [Peak RAM: 5878.69 MB] [Paths: 15348]
+  Run 4: [Time: 0.122s] [Peak RAM: 5878.73 MB] [Paths: 15348]
+  Run 5: [Time: 0.128s] [Peak RAM: 5878.75 MB] [Paths: 15348]
+
+Query 135: match p = (x)-[WorkAt|StudyAt]->(y) return p limit 100000;
+  Run 1: [Time: 0.257s] [Peak RAM: 5879.20 MB] [Paths: 30353]
+  Run 2: [Time: 0.116s] [Peak RAM: 5875.62 MB] [Paths: 30353]
+  Run 3: [Time: 0.140s] [Peak RAM: 5875.66 MB] [Paths: 30353]
+  Run 4: [Time: 0.099s] [Peak RAM: 5875.69 MB] [Paths: 30353]
+  Run 5: [Time: 0.102s] [Peak RAM: 5875.70 MB] [Paths: 30353]
+
+Query 136: match p = (x)-[(IsPartOf.IsPartOf)?]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 4.681s] [Peak RAM: 6081.88 MB] [Paths: 2]
+  Run 2: [Time: 4.097s] [Peak RAM: 6074.34 MB] [Paths: 2]
+  Run 3: [Time: 4.354s] [Peak RAM: 6074.38 MB] [Paths: 2]
+  Run 4: [Time: 4.527s] [Peak RAM: 6074.42 MB] [Paths: 2]
+  Run 5: [Time: 4.089s] [Peak RAM: 6074.44 MB] [Paths: 2]
+
+Query 137: match p = (x)-[(IsPartOf.IsPartOf)?]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 138: match p = (x)-[(IsPartOf.IsPartOf)?]->(y) return p limit 100000;
+  Run 1: [Time: 0.143s] [Peak RAM: 5810.82 MB] [Paths: 100000]
+  Run 2: [Time: 0.054s] [Peak RAM: 5811.24 MB] [Paths: 100000]
+  Run 3: [Time: 0.051s] [Peak RAM: 5807.28 MB] [Paths: 100000]
+  Run 4: [Time: 0.051s] [Peak RAM: 5811.31 MB] [Paths: 100000]
+  Run 5: [Time: 0.051s] [Peak RAM: 5807.32 MB] [Paths: 100000]
+
+Query 139: match p = (x)-[IsPartOf?.IsPartOf]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 4.770s] [Peak RAM: 6081.99 MB] [Paths: 2]
+  Run 2: [Time: 4.221s] [Peak RAM: 6074.47 MB] [Paths: 2]
+  Run 3: [Time: 3.991s] [Peak RAM: 6074.49 MB] [Paths: 2]
+  Run 4: [Time: 4.192s] [Peak RAM: 6074.53 MB] [Paths: 2]
+  Run 5: [Time: 4.002s] [Peak RAM: 6074.55 MB] [Paths: 2]
+
+Query 140: match p = (x)-[IsPartOf?.IsPartOf]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 141: match p = (x)-[IsPartOf?.IsPartOf]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 142: match p = (x)-[IsPartOf+.IsPartOf]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 0.089s] [Peak RAM: 5774.02 MB] [Paths: 1]
+  Run 2: [Time: 0.008s] [Peak RAM: 5774.44 MB] [Paths: 1]
+  Run 3: [Time: 0.009s] [Peak RAM: 5770.49 MB] [Paths: 1]
+  Run 4: [Time: 0.007s] [Peak RAM: 5770.53 MB] [Paths: 1]
+  Run 5: [Time: 0.007s] [Peak RAM: 5770.57 MB] [Paths: 1]
+
+Query 143: match p = (x)-[IsPartOf+.IsPartOf]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: [Time: 0.086s] [Peak RAM: 5778.21 MB] [Paths: 111]
+  Run 2: [Time: 0.009s] [Peak RAM: 5774.64 MB] [Paths: 111]
+  Run 3: [Time: 0.011s] [Peak RAM: 5774.69 MB] [Paths: 111]
+  Run 4: [Time: 0.009s] [Peak RAM: 5774.73 MB] [Paths: 111]
+  Run 5: [Time: 0.009s] [Peak RAM: 5774.75 MB] [Paths: 111]
+
+Query 144: match p = (x)-[IsPartOf+.IsPartOf]->(y) return p limit 100000;
+  Run 1: [Time: 0.082s] [Peak RAM: 5774.89 MB] [Paths: 111]
+  Run 2: [Time: 0.007s] [Peak RAM: 5775.31 MB] [Paths: 111]
+  Run 3: [Time: 0.008s] [Peak RAM: 5771.36 MB] [Paths: 111]
+  Run 4: [Time: 0.006s] [Peak RAM: 5771.38 MB] [Paths: 111]
+  Run 5: [Time: 0.007s] [Peak RAM: 5775.40 MB] [Paths: 111]
+
+Query 145: match p = (x)-[IsPartOf*.IsPartOf]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 4.031s] [Peak RAM: 6082.71 MB] [Paths: 2]
+  Run 2: [Time: 4.330s] [Peak RAM: 6075.93 MB] [Paths: 2]
+  Run 3: [Time: 3.760s] [Peak RAM: 6075.98 MB] [Paths: 2]
+  Run 4: [Time: 3.701s] [Peak RAM: 6076.02 MB] [Paths: 2]
+  Run 5: [Time: 4.080s] [Peak RAM: 6076.06 MB] [Paths: 2]
+
+Query 146: match p = (x)-[IsPartOf*.IsPartOf]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 147: match p = (x)-[IsPartOf*.IsPartOf]->(y) return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 148: match p = (x)-[IsPartOf.IsPartOf?]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 1.617s] [Peak RAM: 6082.82 MB] [Paths: 2]
+  Run 2: [Time: 1.053s] [Peak RAM: 6076.92 MB] [Paths: 2]
+  Run 3: [Time: 0.840s] [Peak RAM: 6075.58 MB] [Paths: 2]
+  Run 4: [Time: 0.746s] [Peak RAM: 6075.45 MB] [Paths: 2]
+  Run 5: [Time: 0.748s] [Peak RAM: 6075.38 MB] [Paths: 2]
+
+Query 149: match p = (x)-[IsPartOf.IsPartOf?]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: [Time: 1.173s] [Peak RAM: 6081.88 MB] [Paths: 1454]
+  Run 2: [Time: 0.839s] [Peak RAM: 6076.11 MB] [Paths: 1454]
+  Run 3: [Time: 0.798s] [Peak RAM: 6075.25 MB] [Paths: 1454]
+  Run 4: [Time: 0.815s] [Peak RAM: 6075.13 MB] [Paths: 1454]
+  Run 5: [Time: 0.858s] [Peak RAM: 6075.11 MB] [Paths: 1454]
+
+Query 150: match p = (x)-[IsPartOf.IsPartOf?]->(y) return p limit 100000;
+  Run 1: [Time: 0.975s] [Peak RAM: 6081.60 MB] [Paths: 1565]
+  Run 2: [Time: 0.890s] [Peak RAM: 6076.34 MB] [Paths: 1565]
+  Run 3: [Time: 1.400s] [Peak RAM: 6074.73 MB] [Paths: 1565]
+  Run 4: [Time: 1.542s] [Peak RAM: 6074.77 MB] [Paths: 1565]
+  Run 5: [Time: 0.862s] [Peak RAM: 6074.71 MB] [Paths: 1565]
+
+Query 151: match p = (x)-[IsPartOf.IsPartOf+]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 0.088s] [Peak RAM: 5775.63 MB] [Paths: 1]
+  Run 2: [Time: 0.010s] [Peak RAM: 5772.06 MB] [Paths: 1]
+  Run 3: [Time: 0.008s] [Peak RAM: 5772.10 MB] [Paths: 1]
+  Run 4: [Time: 0.008s] [Peak RAM: 5772.14 MB] [Paths: 1]
+  Run 5: [Time: 0.008s] [Peak RAM: 5776.16 MB] [Paths: 1]
+
+Query 152: match p = (x)-[IsPartOf.IsPartOf+]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: [Time: 0.092s] [Peak RAM: 5778.13 MB] [Paths: 111]
+  Run 2: [Time: 0.009s] [Peak RAM: 5774.55 MB] [Paths: 111]
+  Run 3: [Time: 0.009s] [Peak RAM: 5774.60 MB] [Paths: 111]
+  Run 4: [Time: 0.010s] [Peak RAM: 5774.63 MB] [Paths: 111]
+  Run 5: [Time: 0.009s] [Peak RAM: 5774.64 MB] [Paths: 111]
+
+Query 153: match p = (x)-[IsPartOf.IsPartOf+]->(y) return p limit 100000;
+  Run 1: [Time: 0.094s] [Peak RAM: 5775.04 MB] [Paths: 111]
+  Run 2: [Time: 0.008s] [Peak RAM: 5775.46 MB] [Paths: 111]
+  Run 3: [Time: 0.007s] [Peak RAM: 5771.51 MB] [Paths: 111]
+  Run 4: [Time: 0.007s] [Peak RAM: 5771.54 MB] [Paths: 111]
+  Run 5: [Time: 0.006s] [Peak RAM: 5775.56 MB] [Paths: 111]
+
+Query 154: match p = (x)-[IsPartOf.IsPartOf*]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 1.457s] [Peak RAM: 6081.82 MB] [Paths: 2]
+  Run 2: [Time: 1.110s] [Peak RAM: 6076.19 MB] [Paths: 2]
+  Run 3: [Time: 0.797s] [Peak RAM: 6075.04 MB] [Paths: 2]
+  Run 4: [Time: 1.509s] [Peak RAM: 6074.97 MB] [Paths: 2]
+  Run 5: [Time: 0.892s] [Peak RAM: 6074.90 MB] [Paths: 2]
+
+Query 155: match p = (x)-[IsPartOf.IsPartOf*]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 156: match p = (x)-[IsPartOf.IsPartOf*]->(y) return p limit 100000;
+  Run 1: [Time: 0.922s] [Peak RAM: 6080.48 MB] [Paths: 1565]
+  Run 2: [Time: 0.815s] [Peak RAM: 6077.12 MB] [Paths: 1565]
+  Run 3: [Time: 1.300s] [Peak RAM: 6076.61 MB] [Paths: 1565]
+  Run 4: [Time: 0.792s] [Peak RAM: 6076.36 MB] [Paths: 1565]
+  Run 5: [Time: 0.779s] [Peak RAM: 6076.45 MB] [Paths: 1565]
+
+Query 157: match p = (x)-[StudyAt?|WorkAt]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 4.209s] [Peak RAM: 6079.95 MB] [Paths: 4]
+  Run 2: [Time: 3.929s] [Peak RAM: 6074.40 MB] [Paths: 4]
+  Run 3: [Time: 3.910s] [Peak RAM: 6074.42 MB] [Paths: 4]
+  Run 4: [Time: 3.914s] [Peak RAM: 6074.46 MB] [Paths: 4]
+  Run 5: [Time: 4.219s] [Peak RAM: 6074.48 MB] [Paths: 4]
+
+Query 158: match p = (x)-[StudyAt?|WorkAt]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 159: match p = (x)-[StudyAt?|WorkAt]->(y) return p limit 100000;
+  Run 1: [Time: 0.168s] [Peak RAM: 5834.74 MB] [Paths: 100000]
+  Run 2: [Time: 0.096s] [Peak RAM: 5835.15 MB] [Paths: 100000]
+  Run 3: [Time: 0.103s] [Peak RAM: 5831.20 MB] [Paths: 100000]
+  Run 4: [Time: 0.084s] [Peak RAM: 5831.24 MB] [Paths: 100000]
+  Run 5: [Time: 0.109s] [Peak RAM: 5835.27 MB] [Paths: 100000]
+
+Query 160: match p = (x)-[StudyAt|WorkAt?]->(y) WHERE x.id = "person_27" return p limit 100000;
+  Run 1: [Time: 3.835s] [Peak RAM: 6080.17 MB] [Paths: 4]
+  Run 2: [Time: 3.840s] [Peak RAM: 6074.64 MB] [Paths: 4]
+  Run 3: [Time: 4.500s] [Peak RAM: 6074.64 MB] [Paths: 4]
+  Run 4: [Time: 3.918s] [Peak RAM: 6074.68 MB] [Paths: 4]
+  Run 5: [Time: 4.022s] [Peak RAM: 6074.71 MB] [Paths: 4]
+
+Query 161: match p = (x)-[StudyAt|WorkAt?]->(y) WHERE x.gender = "female" return p limit 100000;
+  Run 1: FAILED (OOM)
+
+Query 162: match p = (x)-[StudyAt|WorkAt?]->(y) return p limit 100000;
+  Run 1: [Time: 0.225s] [Peak RAM: 5906.11 MB] [Paths: 100000]
+  Run 2: [Time: 0.135s] [Peak RAM: 5902.54 MB] [Paths: 100000]
+  Run 3: [Time: 0.143s] [Peak RAM: 5898.58 MB] [Paths: 100000]
+  Run 4: [Time: 0.143s] [Peak RAM: 5898.62 MB] [Paths: 100000]
+  Run 5: [Time: 0.143s] [Peak RAM: 5902.64 MB] [Paths: 100000]
+
+Query 163: match p = (x)-[((IsPartOf.IsPartOf).IsPartOf)]->(y) WHERE x.id = "place_852" return p limit 100000;
+  Run 1: [Time: 0.079s] [Peak RAM: 5774.05 MB] [Paths: 1]
+  Run 2: [Time: 0.007s] [Peak RAM: 5770.48 MB] [Paths: 1]
+  Run 3: [Time: 0.009s] [Peak RAM: 5770.53 MB] [Paths: 1]
+  Run 4: [Time: 0.007s] [Peak RAM: 5770.57 MB] [Paths: 1]
+  Run 5: [Time: 0.006s] [Peak RAM: 5770.60 MB] [Paths: 1]
+
+Query 164: match p = (x)-[((IsPartOf.IsPartOf).IsPartOf)]->(y) WHERE x.type = "City" return p limit 100000;
+  Run 1: [Time: 0.092s] [Peak RAM: 5773.76 MB] [Paths: 111]
+  Run 2: [Time: 0.010s] [Peak RAM: 5774.19 MB] [Paths: 111]
+  Run 3: [Time: 0.007s] [Peak RAM: 5770.24 MB] [Paths: 111]
+  Run 4: [Time: 0.010s] [Peak RAM: 5774.28 MB] [Paths: 111]
+  Run 5: [Time: 0.007s] [Peak RAM: 5774.30 MB] [Paths: 111]
+
+Query 165: match p = (x)-[((IsPartOf.IsPartOf).IsPartOf)]->(y) return p limit 100000;
+  Run 1: [Time: 0.082s] [Peak RAM: 5774.28 MB] [Paths: 111]
+  Run 2: [Time: 0.009s] [Peak RAM: 5770.70 MB] [Paths: 111]
+  Run 3: [Time: 0.007s] [Peak RAM: 5770.74 MB] [Paths: 111]
+  Run 4: [Time: 0.007s] [Peak RAM: 5770.78 MB] [Paths: 111]
+  Run 5: [Time: 0.006s] [Peak RAM: 5770.81 MB] [Paths: 111]
