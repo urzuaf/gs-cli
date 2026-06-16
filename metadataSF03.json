@@ -1,0 +1,232 @@
+{
+  "nodeCount": 940322,
+  "edgeCount": 5003201,
+  "nodeCountByLabel": {
+    "PERSON": 3788,
+    "POST": 385423,
+    "ORGANISATION": 7955,
+    "PLACE": 1460,
+    "TAGCLASS": 71,
+    "COMMENT": 489040,
+    "TAG": 16080,
+    "FORUM": 36505
+  },
+  "edgeCountByLabel": {
+    "WorkAt": 8022,
+    "StudyAt": 3038,
+    "ContainerOf": 385423,
+    "HasMember": 773633,
+    "HasCreator": 874463,
+    "IsSubclassOf": 70,
+    "HasType": 16080,
+    "IsLocatedIn": 886206,
+    "IsPartOf": 1454,
+    "HasTag": 916129,
+    "ReplyOf": 489040,
+    "HasInterest": 87335,
+    "HasModerator": 36505,
+    "Knows": 45816,
+    "Likes": 479987
+  },
+  "nodeSchema": {
+    "PERSON": [
+      "email",
+      "firstName",
+      "lastName",
+      "birthday",
+      "browserUsed",
+      "locationIP",
+      "language",
+      "creationDate",
+      "gender"
+    ],
+    "POST": [
+      "browserUsed",
+      "language",
+      "content",
+      "length",
+      "imageFile",
+      "creationDate",
+      "locationIP"
+    ],
+    "ORGANISATION": [
+      "type",
+      "name",
+      "url"
+    ],
+    "PLACE": [
+      "type",
+      "name",
+      "url"
+    ],
+    "TAGCLASS": [
+      "url",
+      "name"
+    ],
+    "COMMENT": [
+      "locationIP",
+      "browserUsed",
+      "content",
+      "length",
+      "creationDate"
+    ],
+    "TAG": [
+      "name",
+      "url"
+    ],
+    "FORUM": [
+      "creationDate",
+      "title"
+    ]
+  },
+  "edgeSchema": {
+    "WorkAt": [
+      "creationDate",
+      "workFrom"
+    ],
+    "StudyAt": [
+      "creationDate",
+      "classYear"
+    ],
+    "ContainerOf": [
+      "creationDate"
+    ],
+    "HasMember": [
+      "creationDate"
+    ],
+    "HasCreator": [
+      "creationDate"
+    ],
+    "IsSubclassOf": [],
+    "HasType": [],
+    "IsLocatedIn": [
+      "creationDate"
+    ],
+    "IsPartOf": [],
+    "HasTag": [
+      "creationDate"
+    ],
+    "ReplyOf": [
+      "creationDate"
+    ],
+    "HasInterest": [
+      "creationDate"
+    ],
+    "HasModerator": [
+      "creationDate"
+    ],
+    "Knows": [
+      "creationDate"
+    ],
+    "Likes": [
+      "creationDate"
+    ]
+  },
+  "edgeConnections": {
+    "WorkAt": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 8022
+      }
+    ],
+    "IsLocatedIn": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 886206
+      }
+    ],
+    "IsPartOf": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 1454
+      }
+    ],
+    "HasTag": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 916129
+      }
+    ],
+    "StudyAt": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 3038
+      }
+    ],
+    "ContainerOf": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 385423
+      }
+    ],
+    "HasMember": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 773633
+      }
+    ],
+    "ReplyOf": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 489040
+      }
+    ],
+    "HasCreator": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 874463
+      }
+    ],
+    "IsSubclassOf": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 70
+      }
+    ],
+    "HasType": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 16080
+      }
+    ],
+    "HasInterest": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 87335
+      }
+    ],
+    "HasModerator": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 36505
+      }
+    ],
+    "Knows": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 45816
+      }
+    ],
+    "Likes": [
+      {
+        "srcLabel": "",
+        "dstLabel": "",
+        "count": 479987
+      }
+    ]
+  }
+}
