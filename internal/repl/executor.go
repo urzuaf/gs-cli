@@ -2,6 +2,7 @@ package repl
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"gs-cli/internal/cache"
 	"gs-cli/internal/metastore"
@@ -17,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/linxGnu/grocksdb"
 )
 
 type Executor struct {
@@ -644,8 +647,66 @@ func (e *Executor) showStats() {
 	}
 	defer dbStore.Close()
 
-	fmt.Println("\n[ LSM TREE STRUCTURE ]")
-	fmt.Println(dbStore.GetProperty("rocksdb.levelstats", dbStore.CFNodes))
+	// List of Column Families
+	type CFInfo struct {
+		Name   string
+		Handle *grocksdb.ColumnFamilyHandle
+	}
+	cfs := []CFInfo{
+		{"Nodes", dbStore.CFNodes},
+		{"Edges", dbStore.CFEdges},
+		{"Node Index (Prop)", dbStore.CFIdxNodeProp},
+		{"Edge Index (Prop)", dbStore.CFIdxEdgeProp},
+		{"Edge Index (Src)", dbStore.CFIdxEdgeSrc},
+		{"Edge Index (Dst)", dbStore.CFIdxEdgeDst},
+		{"Label Index", dbStore.CFIdxLabel},
+	}
+
+	fmt.Println("\n==========================================================================")
+	fmt.Println("   ROCKSDB PHYSICAL STORAGE STATISTICS (LOCAL)")
+	fmt.Println("==========================================================================")
+
+	// Table header
+	fmt.Printf("%-20s | %-12s | %-12s | %-12s\n", "Column Family", "Est. Keys", "MemTable Size", "Index/Filter Mem")
+	fmt.Println("--------------------------------------------------------------------------")
+
+	var totalKeys int64
+	var totalMemTable int64
+	var totalIndexMem int64
+
+	for _, cf := range cfs {
+		keys := getIntProperty(dbStore, "rocksdb.estimate-num-keys", cf.Handle)
+		memTable := getIntProperty(dbStore, "rocksdb.cur-size-all-mem-tables", cf.Handle)
+		indexMem := getIntProperty(dbStore, "rocksdb.estimate-table-readers-mem", cf.Handle)
+
+		totalKeys += keys
+		totalMemTable += memTable
+		totalIndexMem += indexMem
+
+		fmt.Printf("%-20s | %-12s | %-12s | %-12s\n",
+			cf.Name,
+			formatWithCommas(keys),
+			formatBytes(memTable),
+			formatBytes(indexMem),
+		)
+	}
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Printf("%-20s | %-12s | %-12s | %-12s\n",
+		"TOTAL",
+		formatWithCommas(totalKeys),
+		formatBytes(totalMemTable),
+		formatBytes(totalIndexMem),
+	)
+	fmt.Println("==========================================================================")
+
+	// Detailed Level stats for main CFs
+	fmt.Println("\n[ Detailed Level Stats for Nodes & Edges ]")
+	fmt.Println("--------------------------------------------------------------------------")
+	fmt.Println("--- Nodes (CFNodes) Stats ---")
+	fmt.Println(strings.TrimSpace(dbStore.GetProperty("rocksdb.levelstats", dbStore.CFNodes)))
+	fmt.Println("\n--- Edges (CFEdges) Stats ---")
+	fmt.Println(strings.TrimSpace(dbStore.GetProperty("rocksdb.levelstats", dbStore.CFEdges)))
+	fmt.Println("==========================================================================")
 }
 
 func (e *Executor) describe() {
@@ -656,12 +717,132 @@ func (e *Executor) describe() {
 			fmt.Printf("Error loading metadata: %v\n", err)
 			return
 		}
-		fmt.Printf("Nodes: %d, Edges: %d\n", meta.NodeCount, meta.EdgeCount)
+		printMetadata(meta)
 	} else if e.State.CurrentMode == session.ModeRemote && e.State.ActiveDB != "" {
-		fmt.Println("Describe remote not fully implemented yet.")
+		fmt.Printf("Fetching remote metadata for database '%s'...\n", e.State.ActiveDB)
+		jsonStr, err := e.State.Client.DescribeDatabase(e.State.ActiveDB)
+		if err != nil {
+			fmt.Printf("Error describing remote database: %v\n", err)
+			return
+		}
+		var meta metastore.MetaData
+		if err := json.Unmarshal([]byte(jsonStr), &meta); err != nil {
+			fmt.Printf("Error parsing remote metadata: %v\n", err)
+			return
+		}
+		printMetadata(&meta)
 	} else {
 		fmt.Println("Select a database first.")
 	}
+}
+
+func getIntProperty(store *rocks.Store, prop string, cf *grocksdb.ColumnFamilyHandle) int64 {
+	valStr := store.GetProperty(prop, cf)
+	val, err := strconv.ParseInt(valStr, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return val
+}
+
+func formatBytes(bytes int64) string {
+	const unit = 1024
+	if bytes < unit {
+		return fmt.Sprintf("%d B", bytes)
+	}
+	div, exp := int64(unit), 0
+	for n := bytes / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.2f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
+}
+
+func formatWithCommas(num int64) string {
+	str := strconv.FormatInt(num, 10)
+	var result []byte
+	length := len(str)
+	for i, rune := range str {
+		if i > 0 && (length-i)%3 == 0 && str[i-1] != '-' {
+			result = append(result, ',')
+		}
+		result = append(result, byte(rune))
+	}
+	return string(result)
+}
+
+func printMetadata(meta *metastore.MetaData) {
+	fmt.Println("\n==========================================================================")
+	fmt.Println("   DATABASE SCHEMA & METADATA")
+	fmt.Println("==========================================================================")
+	fmt.Printf("General Info:\n")
+	fmt.Printf("  Total Nodes : %s\n", formatWithCommas(meta.NodeCount))
+	fmt.Printf("  Total Edges : %s\n", formatWithCommas(meta.EdgeCount))
+	fmt.Println()
+
+	fmt.Printf("Node Labels:\n")
+	if len(meta.NodeCountByLabel) == 0 {
+		fmt.Printf("  (No nodes)\n")
+	} else {
+		nodeLabels := make([]string, 0, len(meta.NodeCountByLabel))
+		for label := range meta.NodeCountByLabel {
+			nodeLabels = append(nodeLabels, label)
+		}
+		sort.Strings(nodeLabels)
+
+		for _, label := range nodeLabels {
+			count := meta.NodeCountByLabel[label]
+			props := meta.NodeSchema[label]
+			sort.Strings(props)
+
+			propStr := "None"
+			if len(props) > 0 {
+				propStr = strings.Join(props, ", ")
+			}
+			fmt.Printf("  - %s: %s nodes\n", label, formatWithCommas(count))
+			fmt.Printf("    Properties: %s\n", propStr)
+		}
+	}
+	fmt.Println()
+
+	fmt.Printf("Edge Labels & Connections:\n")
+	if len(meta.EdgeCountByLabel) == 0 {
+		fmt.Printf("  (No edges)\n")
+	} else {
+		edgeLabels := make([]string, 0, len(meta.EdgeCountByLabel))
+		for label := range meta.EdgeCountByLabel {
+			edgeLabels = append(edgeLabels, label)
+		}
+		sort.Strings(edgeLabels)
+
+		for _, label := range edgeLabels {
+			count := meta.EdgeCountByLabel[label]
+			props := meta.EdgeSchema[label]
+			sort.Strings(props)
+
+			propStr := "None"
+			if len(props) > 0 {
+				propStr = strings.Join(props, ", ")
+			}
+			fmt.Printf("  - %s: %s edges\n", label, formatWithCommas(count))
+
+			conns := meta.EdgeConnections[label]
+			if len(conns) > 0 {
+				fmt.Printf("    Connections:\n")
+				sort.Slice(conns, func(i, j int) bool {
+					if conns[i].SrcLabel != conns[j].SrcLabel {
+						return conns[i].SrcLabel < conns[j].SrcLabel
+					}
+					return conns[i].DstLabel < conns[j].DstLabel
+				})
+				for _, conn := range conns {
+					fmt.Printf("      • %s -> %s (%s)\n", conn.SrcLabel, conn.DstLabel, formatWithCommas(conn.Count))
+				}
+			}
+			fmt.Printf("    Properties: %s\n", propStr)
+		}
+	}
+	fmt.Println("==========================================================================")
 }
 
 func parseArgs(in string) []string {

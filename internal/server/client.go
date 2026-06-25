@@ -107,6 +107,29 @@ func (c *Client) UseDatabase(dbName string) (string, error) {
 	return result.Message, nil
 }
 
+func (c *Client) DescribeDatabase(dbName string) (string, error) {
+	if ok, err := c.CheckStatus(); !ok || err != nil {
+		return "", fmt.Errorf("server is not reachable")
+	}
+
+	resp, err := c.HTTPClient.Get(c.BaseURL + "/api/v1/database/describe/" + dbName)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var result RequestReturnContent
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", err
+	}
+
+	if !result.Success {
+		return "", fmt.Errorf("%s", result.Message)
+	}
+	return result.Message, nil
+}
+
+
 func (c *Client) Query(dbName, query string, dryRun bool) (*RequestReturnContent, error) {
 	if ok, err := c.CheckStatus(); !ok || err != nil {
 		return nil, fmt.Errorf("server is not reachable")
